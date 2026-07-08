@@ -161,7 +161,7 @@
   .outreach .draft .dh span{font-family:var(--mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
   .outreach textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--body);font-size:13px;padding:11px;line-height:1.55;resize:vertical;outline:none}
   .outreach textarea:focus{border-color:var(--amber)}
-  .outreach textarea.li{min-height:120px}.outreach textarea.em{min-height:180px}
+  .outreach textarea.li{min-height:120px}.outreach textarea.em{min-height:180px}.outreach textarea.xr{min-height:58px}
   .outreach .subj{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px;margin-bottom:6px;outline:none}
   .copybtn{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:var(--body)}
   .copybtn:hover{border-color:var(--amber)}
@@ -276,6 +276,7 @@
     <div class="segmented">
       <button class="seg active" id="segSearch">Search users</button>
       <button class="seg" id="segContrib">Contributors of repo / org</button>
+      <button class="seg" id="segXray">Boolean / X-ray</button>
     </div>
 
     <div id="searchPanel">
@@ -297,6 +298,19 @@
       </div>
       <button class="btn" id="runContrib">Find contributors</button>
       <div class="findnote">Repo = contributors of one repo. Org = aggregates contributors across the org's most recently active repos (up to 12) and ranks by commit count. Org mode uses many API calls — <b>add a token</b>.</div>
+    </div>
+
+    <div id="xrayPanel" class="hidden">
+      <div class="findgrid">
+        <input id="xTitle" placeholder="job titles e.g. Senior Go Engineer, Backend Engineer">
+        <input id="xSkills" placeholder="must-have skills e.g. Go, gRPC, Kubernetes">
+        <input id="xLoc" placeholder="locations e.g. Jakarta, Indonesia">
+        <input id="xCompany" placeholder="target companies (optional) e.g. Tokopedia, Gojek">
+        <input id="xExclude" placeholder="exclude words e.g. recruiter, hiring, student">
+      </div>
+      <button class="btn" id="runXray">Build search strings</button>
+      <div class="findnote">Comma-separate each field. Titles / locations / companies are OR-grouped; skills are all required (AND). These find <b>public profiles</b> on Google & LinkedIn — same public-only bias as everything else here.</div>
+      <div id="xrayOut"></div>
     </div>
 
     <div id="findStatus" class="status"></div>
@@ -326,6 +340,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   const savedJd=lsGet('scout_jd'); if(savedJd){$('jd').value=savedJd;$('roleBox').open=true;$('jdSaved').textContent='· saved ✓';}
   const rem=lsGet('scout_remember')==='1';
   if(rem){$('remtoken').checked=true; const t=lsGet('scout_token'); if(t){$('token').value=t; syncMode();}}
+  ['xTitle','xSkills','xLoc','xCompany','xExclude'].forEach(id=>{const v=lsGet('scout_'+id);if(v&&$(id))$(id).value=v;});
   // deep-link: ?u=username (used by the Chrome extension "Open in Scout")
   const qu=new URLSearchParams(location.search).get('u');
   if(qu){$('user').value=qu.replace(/^@/,''); setTimeout(()=>run(),350);}
@@ -785,8 +800,61 @@ $('exportCsv').onclick=exportCsv;
 $('clearShort').onclick=()=>{if(confirm('Clear all saved candidates? This cannot be undone.')){setShort([]);renderShortlist();}};
 updateShortCount();
 
-$('segSearch').onclick=()=>{$('segSearch').classList.add('active');$('segContrib').classList.remove('active');$('searchPanel').classList.remove('hidden');$('contribPanel').classList.add('hidden');};
-$('segContrib').onclick=()=>{$('segContrib').classList.add('active');$('segSearch').classList.remove('active');$('contribPanel').classList.remove('hidden');$('searchPanel').classList.add('hidden');};
+function showSeg(which){
+  $('searchPanel').classList.toggle('hidden',which!=='search');
+  $('contribPanel').classList.toggle('hidden',which!=='contrib');
+  $('xrayPanel').classList.toggle('hidden',which!=='xray');
+  $('segSearch').classList.toggle('active',which==='search');
+  $('segContrib').classList.toggle('active',which==='contrib');
+  $('segXray').classList.toggle('active',which==='xray');
+  if(which==='xray'){$('findResults').innerHTML='';$('findStatus').textContent='';}
+}
+$('segSearch').onclick=()=>showSeg('search');
+$('segContrib').onclick=()=>showSeg('contrib');
+$('segXray').onclick=()=>showSeg('xray');
+
+/* ---------- Boolean / X-ray builder ---------- */
+function xTerms(v){return (v||'').split(',').map(s=>s.trim()).filter(Boolean);}
+function xq(t){return '"'+t.replace(/"/g,'')+'"';}
+function xor(list){return list.length?'('+list.map(xq).join(' OR ')+')':'';}
+function xand(list){return list.length?'('+list.map(xq).join(' AND ')+')':'';}
+function xblock(title,val,g){
+  return `<div class="draft"><div class="dh"><span>${title}</span><div style="display:flex;gap:6px">${g?`<button class="copybtn" data-q="${escAttr(val)}" onclick="xrunGoogle(this)">Run on Google \u2197</button>`:''}<button class="copybtn" data-v="${escAttr(val)}" onclick="xcopy(this)">Copy</button></div></div><textarea class="xr" readonly>${escHtml(val)}</textarea></div>`;
+}
+function xcopy(b){navigator.clipboard.writeText(b.dataset.v).then(()=>{const o=b.textContent;b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1500);}).catch(()=>{});}
+function xrunGoogle(b){window.open('https://www.google.com/search?q='+encodeURIComponent(b.dataset.q),'_blank','noopener');}
+function runXray(){
+  const titles=xTerms($('xTitle').value),skills=xTerms($('xSkills').value),locs=xTerms($('xLoc').value),comps=xTerms($('xCompany').value),excl=xTerms($('xExclude').value);
+  ['xTitle','xSkills','xLoc','xCompany','xExclude'].forEach(id=>lsSet('scout_'+id,$(id).value));
+  if(!titles.length&&!skills.length&&!locs.length){$('xrayOut').innerHTML='<div class="status err" style="padding:10px 0">Add at least a title, skill, or location.</div>';return;}
+  let li=['site:linkedin.com/in'];
+  if(titles.length)li.push(xor(titles));
+  skills.forEach(s=>li.push(xq(s)));
+  if(comps.length)li.push(xor(comps));
+  if(locs.length)li.push(xor(locs));
+  li.push('-intitle:"profiles" -inurl:"dir/"');
+  excl.forEach(e=>li.push('-'+(/\s/.test(e)?xq(e):e)));
+  const liXray=li.filter(Boolean).join(' ');
+  const nb=[];
+  if(titles.length)nb.push(xor(titles));
+  if(skills.length)nb.push(xand(skills));
+  if(comps.length)nb.push(xor(comps));
+  if(locs.length)nb.push(xor(locs));
+  let liBool=nb.filter(Boolean).join(' AND ');
+  if(excl.length)liBool+=' NOT ('+excl.map(xq).join(' OR ')+')';
+  let g=['site:github.com'];
+  skills.forEach(s=>g.push(xq(s)));
+  if(titles.length)g.push(xor(titles));
+  if(locs.length)g.push(xor(locs));
+  excl.forEach(e=>g.push('-'+(/\s/.test(e)?xq(e):e)));
+  const ghXray=g.filter(Boolean).join(' ');
+  $('xrayOut').innerHTML='<div class="outreach" style="margin-top:16px">'+
+    xblock('LinkedIn — Google X-ray',liXray,true)+
+    xblock('LinkedIn — native Boolean (paste in LinkedIn search bar)',liBool,false)+
+    xblock('GitHub — Google X-ray',ghXray,true)+
+    '<div class="legend">Titles / locations / companies are OR-grouped; skills are ANDed (all required — delete some to broaden). For native GitHub search by language/location/followers, use the "Search users" tab. X-ray finds public profiles only.</div></div>';
+}
+$('runXray').onclick=runXray;
 
 const fstat=()=>$('findStatus');
 function findErr(e){const s=fstat();s.className='status err';
