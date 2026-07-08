@@ -153,6 +153,19 @@
   .aibtn.claude{background:#2a1a10;border-color:#4a2f18;color:#ffb454}
   .aibtn.gpt{background:#0f2018;border-color:#1e3b2b;color:#7fe0aa}
   .ainote{font-family:var(--mono);font-size:10px;color:var(--faint);width:100%;margin-top:2px}
+  .outreach .ctx{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .outreach .ctx input{background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px;outline:none}
+  .outreach .ctx input:focus{border-color:var(--amber)}
+  .outreach .draft{margin-bottom:14px}
+  .outreach .draft .dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .outreach .draft .dh span{font-family:var(--mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+  .outreach textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--body);font-size:13px;padding:11px;line-height:1.55;resize:vertical;outline:none}
+  .outreach textarea:focus{border-color:var(--amber)}
+  .outreach textarea.li{min-height:120px}.outreach textarea.em{min-height:180px}
+  .outreach .subj{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px;margin-bottom:6px;outline:none}
+  .copybtn{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:var(--body)}
+  .copybtn:hover{border-color:var(--amber)}
+  @media(max-width:640px){.outreach .ctx{grid-template-columns:1fr}}
 
   .tabs{display:flex;gap:8px;margin-bottom:16px}
   .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--disp);font-weight:500;font-size:15px;padding:6px 4px;cursor:pointer}
@@ -481,6 +494,7 @@ function copyPrompt(btn){
 function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,social){
   const a=analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd);
   window.__scoutPrompt=buildAIPrompt(a);
+  window.__scoutA=a;
   const sc=a.score,col=scoreColor(sc);
   const fit=[],flags=[];
   if(a.stars>=100)fit.push(`Public projects have real traction — ${fmt(a.stars)} stars, top repo \u2605${fmt(a.topStars)}.`);
@@ -538,6 +552,7 @@ function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,soci
       <div class="caveat"><b>Honesty check:</b> ${a.hasJd?'JD match separates <i>proven in code</i> (GitHub) from merely <i>claimed</i> (LinkedIn). Claimed-only skills are interview questions, not facts; a gap can also mean private work.':(a.contrib?'Deep mode shows verified counts but can\u2019t reveal what private code is. Screening signal, never a verdict.':'GitHub shows only public work. Add a token for verified numbers; always confirm skill in a live loop.')}</div>
     </div></div>
     ${aibar}
+    ${outreachSection(a)}
     ${contactSection(profile,social)}
     ${jdSection(a)}
     ${contribSection}
@@ -554,6 +569,67 @@ function placement(a){const disc=bestFit(a),lvl=a.level.split(' signal')[0];
   if(a.score>=5)return `Worth a screen for ${disc}. Probe depth in interview.`;
   if(a.score>=3)return `Borderline on GitHub alone. Advance only with work samples or a take-home.`;
   return `Public data can\u2019t carry a decision. Likely early-career or a private-repo engineer.`;}
+
+/* ---------- proof-first outreach ---------- */
+function escHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escAttr(s){return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function trimDesc(s){s=(s||'').replace(/\s+/g,' ').trim();return s.length>64?s.slice(0,64)+'…':s;}
+function hookPhrase(a){
+  const r=a.topRepos&&a.topRepos[0];
+  if(r&&r.stargazers_count>=5)return `your project ${r.name} (${fmt(r.stargazers_count)}★)${r.description?` — ${trimDesc(r.description)}`:''}`;
+  if(r&&r.description)return `your project ${r.name} — ${trimDesc(r.description)}`;
+  if(a.contrib&&a.commits>=300)return `how consistently you ship on GitHub (${fmt(a.commits)} commits in the last year)`;
+  if(a.langs[0])return `your ${a.langs[0].name} work on GitHub`;
+  return `your GitHub profile`;
+}
+function buildOutreach(a,ctx){
+  const p=a.profile;
+  const first=((p.name||p.login).trim().split(/\s+/)[0])||p.login;
+  const hook=hookPhrase(a);
+  const lang=a.langs[0]?a.langs[0].name:(a.skills[0]?a.skills[0].name:'engineering');
+  const proven=a.jdMatch&&a.jdMatch.rows.find(r=>r.verdict==='proven');
+  const skillLine=proven?`your hands-on ${proven.name}`:`your ${lang} work`;
+  const role=(ctx.role||'').trim()||'a role on our team';
+  const co=(ctx.company||'').trim();
+  const cta=(ctx.cta||'').trim()||'Would you be open to a quick chat?';
+  const sign=(ctx.name||'').trim()?`\n\n– ${ctx.name.trim()}`:'';
+  let li=`Hi ${first}, I came across ${hook} — really solid.\n\n`;
+  if(co)li+=`${co}\n\n`;
+  li+=`We're hiring for ${role} and ${skillLine} lines up well. ${cta}${sign}`;
+  const subj=`${first} — your ${lang} work + ${role}`;
+  let email=`Hi ${first},\n\nI came across ${hook} and wanted to reach out directly.\n\n`;
+  email+=`We're hiring for ${role}, and ${skillLine} is exactly the background we're after.`;
+  if(co)email+=` For context: ${co}`;
+  email+=`\n\n${cta} Either way, happy to share more detail if it's useful — no pressure.${sign}`;
+  return {li,subj,email};
+}
+function outreachSection(a){
+  const ctx={name:lsGet('scout_o_name')||'',company:lsGet('scout_o_co')||'',role:lsGet('scout_o_role')||'',cta:lsGet('scout_o_cta')||''};
+  const d=buildOutreach(a,ctx);
+  return `<section class="outreach"><div class="sh">Proof-first outreach draft <span class="pill est">edit before sending</span></div>
+    <div class="ctx">
+      <input id="oName" placeholder="Your name (sign-off)" value="${escAttr(ctx.name)}" oninput="scoutRegen()">
+      <input id="oRole" placeholder="Role you're hiring e.g. Senior Go Engineer" value="${escAttr(ctx.role)}" oninput="scoutRegen()">
+      <input id="oCo" placeholder="One-line credibility (funding, product, scale)" value="${escAttr(ctx.company)}" oninput="scoutRegen()">
+      <input id="oCta" placeholder="Call to action e.g. Open to a 15-min chat this week?" value="${escAttr(ctx.cta)}" oninput="scoutRegen()">
+    </div>
+    <div class="draft"><div class="dh"><span>LinkedIn / DM — short</span><button class="copybtn" onclick="scoutCopy(this,'oLi')">Copy</button></div>
+      <textarea id="oLi" class="li">${escHtml(d.li)}</textarea></div>
+    <div class="draft"><div class="dh"><span>Email</span><button class="copybtn" onclick="scoutCopyEmail(this)">Copy</button></div>
+      <input id="oSubj" class="subj" value="${escAttr(d.subj)}">
+      <textarea id="oEmail" class="em">${escHtml(d.email)}</textarea></div>
+    <div class="legend">The opening line is pulled from their real GitHub — that specific hook is what stops it reading as mass outreach. If the profile is thin the hook is weak, so rewrite the first line yourself. Never send unedited to a batch. No price in a first message. Your name/role/credibility save on this device and reuse across candidates.</div>
+  </section>`;
+}
+function scoutRegen(){
+  if(!window.__scoutA)return;
+  const ctx={name:$('oName').value,company:$('oCo').value,role:$('oRole').value,cta:$('oCta').value};
+  lsSet('scout_o_name',ctx.name);lsSet('scout_o_co',ctx.company);lsSet('scout_o_role',ctx.role);lsSet('scout_o_cta',ctx.cta);
+  const d=buildOutreach(window.__scoutA,ctx);
+  $('oLi').value=d.li;$('oSubj').value=d.subj;$('oEmail').value=d.email;
+}
+function scoutCopy(btn,id){const t=$(id).value;navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1500);}).catch(()=>{});}
+function scoutCopyEmail(btn){const t='Subject: '+$('oSubj').value+'\n\n'+$('oEmail').value;navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1500);}).catch(()=>{});}
 
 /* ---------- discovery: tabs + search + contributors ---------- */
 function showTab(which){
