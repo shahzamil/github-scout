@@ -339,6 +339,24 @@ async function fetchByteLanguages(owned,token){
     const res=await Promise.all(batch.map(r=>gh(`/repos/${r.full_name}/languages`,token).catch(()=>({}))));res.forEach(o=>{for(const[l,b]of Object.entries(o))totals[l]=(totals[l]||0)+b;});}
   return totals;}
 
+async function fetchCollaboration(u,token){
+  const enc=encodeURIComponent;
+  const authored=await gh('/search/issues?q='+enc('author:'+u+' type:pr')+'&per_page=100&sort=updated&order=desc',token);
+  let mergedTotal=null;
+  try{const m=await gh('/search/issues?q='+enc('author:'+u+' type:pr is:merged')+'&per_page=1',token);mergedTotal=m.total_count;}catch(e){}
+  const items=authored.items||[];
+  const ext={};
+  items.forEach(it=>{const ru=it.repository_url||'';const parts=ru.split('/');const owner=parts[parts.length-2],name=parts[parts.length-1];
+    if(owner&&name&&owner.toLowerCase()!==u.toLowerCase()){const full=owner+'/'+name;ext[full]=(ext[full]||0)+1;}});
+  const distinctExternal=Object.keys(ext).length;
+  const externalPRs=Object.values(ext).reduce((a,b)=>a+b,0);
+  const topExt=Object.entries(ext).sort((a,b)=>b[1]-a[1]).slice(0,6).map(e=>e[0]);
+  const notable=[];
+  for(const full of topExt){try{const r=await gh('/repos/'+full,token);notable.push({full,stars:r.stargazers_count,prs:ext[full]});}catch(e){}}
+  notable.sort((a,b)=>b.stars-a.stars);
+  return {authoredPRs:authored.total_count,mergedPRs:mergedTotal,distinctExternal,externalPRs,notable};
+}
+
 const fmt=n=>(n==null)?'0':(n>=1000?(n/1000).toFixed(n>=10000?0:1)+'k':''+n);
 const pct=(a,b)=>b?Math.round(a/b*100):0;
 const daysBetween=(a,b)=>Math.round((a-b)/86400000);
@@ -365,8 +383,10 @@ async function run(){
     let events=[];try{events=await gh(`/users/${u}/events/public?per_page=100`,token);}catch(e){events=[];}
     let contrib=null,byteLangs=null;
     if(token){status.textContent='Pulling contribution history (GraphQL)…';try{contrib=await graphql(u,token);}catch(e){}try{byteLangs=await fetchByteLanguages(owned,token);}catch(e){}}
+    status.textContent='Checking open-source collaboration…';
+    let collab=null; try{collab=await fetchCollaboration(u,token);}catch(e){collab=null;}
     status.textContent='';
-    render(profile,repos,events,contrib,byteLangs,!!token,linkedin,jd,social);
+    render(profile,repos,events,contrib,byteLangs,!!token,linkedin,jd,social,collab);
     report.classList.remove('hidden');report.scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){
     status.className='status err';
@@ -377,7 +397,7 @@ async function run(){
   }finally{$('go').disabled=false;}
 }
 
-function analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd){
+function analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,collab){
   const now=Date.now();const owned=repos.filter(r=>!r.fork),forks=repos.filter(r=>r.fork);
   const deepLang=byteLangs&&Object.keys(byteLangs).length>0;
   let langs;
@@ -402,14 +422,22 @@ function analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd){
   const followers=profile.followers,following=profile.following||0;
   const originalPct=repos.length?pct(owned.length,repos.length):0;
   const emptyPct=owned.length?pct(owned.filter(r=>r.stargazers_count===0&&!r.description&&r.size<50).length,owned.length):0;
+  const LEARN=/(tutorial|learn|bootcamp|hello[-_ ]?world|todo[-_ ]?app|test[-_ ]?repo|practice|exercise|course|clone|demo|sample|playground|my[-_ ]?first|coding[-_ ]?challenge)/i;
+  const learnCount=owned.filter(r=>LEARN.test(r.name||'')||LEARN.test(r.description||'')).length;
+  const learnPct=owned.length?pct(learnCount,owned.length):0;
   const impact=Math.min(10,stars<=0?0.5:Math.log10(stars)*2.4+Math.min(topStars,1000)/500);
   const recency=daysSince<=7?10:daysSince<=30?8:daysSince<=90?6:daysSince<=180?4:daysSince<=365?2:0.5;
   const activity=Math.min(10,activeDays/(contrib?18:9)+commits/(contrib?120:25));
-  const originality=repos.length?Math.min(10,originalPct/12+Math.min(owned.length,30)/6):1;
+  let originality=repos.length?Math.min(10,originalPct/12+Math.min(owned.length,30)/6):1;
+  if(learnPct>=40)originality*=0.7;
   const breadth=Math.min(10,langs.length*1.1+skills.length*0.6);
   const tenure=Math.min(10,ageDays/365*1.6+Math.min(followers,500)/80);
-  const weights={Impact:0.30,Activity:0.18,Recency:0.14,Originality:0.14,Breadth:0.14,Tenure:0.10};
+  let collabScore=null; const collabMeasured=!!collab;
+  if(collab){const notableStarred=collab.notable.filter(n=>n.stars>=50).length;const bigStarred=collab.notable.filter(n=>n.stars>=1000).length;
+    collabScore=Math.min(10,(collab.mergedPRs||0)/6+collab.distinctExternal*0.7+notableStarred*1.4+bigStarred*1.5);}
+  const weights=collabMeasured?{Impact:0.24,Collaboration:0.16,Activity:0.16,Recency:0.12,Originality:0.12,Breadth:0.10,Tenure:0.10}:{Impact:0.30,Activity:0.18,Recency:0.14,Originality:0.14,Breadth:0.14,Tenure:0.10};
   const comps={Impact:impact,Activity:activity,Recency:recency,Originality:originality,Breadth:breadth,Tenure:tenure};
+  if(collabMeasured)comps.Collaboration=collabScore;
   let score=0;for(const k in weights)score+=comps[k]*weights[k];score=Math.round(score*10)/10;
   let jdMatch=null;
   if(jd&&jdReq.size){
@@ -426,7 +454,7 @@ function analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd){
   else if(senior>=2||mid>=3){level='Mid → Senior signal';levelWhy='Solid independent projects and range; limited large-scale public traction.';}
   else if(mid>=2){level='Junior → Mid signal';levelWhy='Real building activity, still light on impact/depth in public work.';}
   else{level='Early / thin public signal';levelWhy='Not enough public evidence to place a level.';}
-  return {profile,owned,forks,langs,deepLang,fePct,bePct,lean,skills,stars,topStars,topRepos,commits,commitBasis,activeDays,daysSince,privateCount,totalContrib,streak,calendar,prs,issues,ageYears,ageDays,followers,following,originalPct,emptyPct,score,comps,weights,level,levelWhy,hasToken,contrib:!!contrib,ghProven,linProven,jdReq,jdMatch,hasLinkedin:!!linkedin,hasJd:!!jd,jdText:jd,linkedinText:linkedin};
+  return {profile,owned,forks,langs,deepLang,fePct,bePct,lean,skills,stars,topStars,topRepos,commits,commitBasis,activeDays,daysSince,privateCount,totalContrib,streak,calendar,prs,issues,ageYears,ageDays,followers,following,originalPct,emptyPct,score,comps,weights,level,levelWhy,hasToken,contrib:!!contrib,ghProven,linProven,jdReq,jdMatch,hasLinkedin:!!linkedin,hasJd:!!jd,jdText:jd,linkedinText:linkedin,collab,collabMeasured,learnPct};
 }
 
 function heatmap(cal){if(!cal||!cal.length)return'';const max=Math.max(...cal.map(d=>d.contributionCount),1);const color=c=>{if(c===0)return'var(--panel2)';const r=c/max;return r<=0.25?'#5a3d12':r<=0.5?'#8a5c15':r<=0.75?'#cf8a1e':'var(--amber)';};const cell=11,gap=2,weeks=[];for(let i=0;i<cal.length;i+=7)weeks.push(cal.slice(i,i+7));const w=weeks.length*(cell+gap),h=7*(cell+gap);let rects='';weeks.forEach((wk,x)=>wk.forEach((d,y)=>{rects+=`<rect x="${x*(cell+gap)}" y="${y*(cell+gap)}" width="${cell}" height="${cell}" rx="2" fill="${color(d.contributionCount)}"><title>${d.date}: ${d.contributionCount}</title></rect>`;}));return `<div class="heat"><svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${rects}</svg></div><div class="heatleg">Less <i style="background:var(--panel2)"></i><i style="background:#5a3d12"></i><i style="background:#8a5c15"></i><i style="background:#cf8a1e"></i><i style="background:var(--amber)"></i> More · last 12 months</div>`;}
@@ -475,6 +503,7 @@ function buildAIPrompt(a){
   if(p.twitter_username)out+=`- X: @${p.twitter_username}\n`;
   out+=`\nAUTOMATED GITHUB SIGNAL\n- Top languages: ${a.langs.slice(0,6).map(l=>l.name+' '+l.pct+'%').join(', ')||'n/a'}\n- Frontend/Backend: ${a.fePct}/${a.bePct} (${a.lean})\n- Skills seen in code: ${[...a.ghProven].slice(0,14).join(', ')||'n/a'}\n- Stars: ${a.stars}; top repo ${a.topRepos[0]?a.topRepos[0].name+' (★'+a.topRepos[0].stargazers_count+')':'n/a'}\n- Commits: ${a.commits} (${a.commitBasis}); last active ${a.daysSince>365?Math.round(a.daysSince/30)+'mo':a.daysSince+'d'} ago${a.privateCount?`; ${a.privateCount} private contributions in last year`:''}\n- Automated GitHub score: ${a.score}/10 (${a.level})\n`;
   out+=`- Notable repos: ${a.topRepos.map(r=>r.name+(r.description?' — '+trim(r.description,60):'')).join(' | ')||'n/a'}\n`;
+  if(a.collabMeasured)out+=`- OSS collaboration: ${a.collab.authoredPRs} PRs authored, ${a.collab.mergedPRs!=null?a.collab.mergedPRs:'?'} merged, to ${a.collab.distinctExternal} external repos${a.collab.notable.filter(n=>n.stars>=50).length?` incl. ${a.collab.notable.filter(n=>n.stars>=50).slice(0,3).map(n=>n.full+' (★'+n.stars+')').join(', ')}`:''}\n`;
   if(a.hasJd){out+=`\nROLE (job description)\n${trim(a.jdText,1200)}\n`;if(a.jdMatch)out+=`Automated JD match: ${a.jdMatch.matchPct}% — proven: ${a.jdMatch.rows.filter(r=>r.verdict==='proven').map(r=>r.name).join(', ')||'none'}; claimed-only: ${a.jdMatch.claimedOnly.join(', ')||'none'}; gaps: ${a.jdMatch.gaps.join(', ')||'none'}\n`;}
   if(a.hasLinkedin)out+=`\nLINKEDIN (self-reported, provided by recruiter): ${trim(a.linkedinText,500)}\n`;
   out+=`\nTASKS\n1. Search the web for this person's public professional footprint — personal site, blog, conference talks, notable open-source work, papers, other developer profiles. Use primary sources. Explicitly flag anything uncertain or possibly a different person with the same name.\n2. Assess fit${a.hasJd?' for the role above':' for a senior software engineering role'}. Separate what is PROVEN (public code/work) from what is only CLAIMED (LinkedIn/self-report).\n3. Give: a score out of 10, a seniority read, key strengths, risks/gaps, and 4-6 specific questions to probe in an interview.\nBe explicit about what you could and could not verify.`;
@@ -491,8 +520,8 @@ function copyPrompt(btn){
   navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1500);}).catch(()=>{});
 }
 
-function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,social){
-  const a=analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd);
+function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,social,collab){
+  const a=analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,collab);
   window.__scoutPrompt=buildAIPrompt(a);
   window.__scoutA=a;
   const sc=a.score,col=scoreColor(sc);
@@ -504,6 +533,8 @@ function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,soci
   if(a.daysSince<=30)fit.push(`Actively coding — last contribution ${a.daysSince} day${a.daysSince===1?'':'s'} ago${a.streak?`, ${a.streak}-day streak`:''}.`);
   if(a.lean==='Full-stack')fit.push('Ships both frontend and backend.');
   if(a.skills.length>=5)fit.push(`Range: ${a.skills.slice(0,4).map(s=>s.name).join(', ')} across repos.`);
+  if(a.collab&&a.collab.notable.some(n=>n.stars>=200)){const top=a.collab.notable.filter(n=>n.stars>=200).sort((x,y)=>y.stars-x.stars)[0];fit.push(`Contributes to notable OSS — PRs to ${top.full} (\u2605${fmt(top.stars)}). That's real collaboration, not just solo repos.`);}
+  else if(a.collab&&a.collab.mergedPRs>=20)fit.push(`${fmt(a.collab.mergedPRs)} merged PRs across ${a.collab.distinctExternal} repos they don't own — works well in others' codebases.`);
   if(a.jdMatch&&a.jdMatch.matchPct>=75)fit.push(`Strong JD fit — ${a.jdMatch.matchPct}% matched, most proven in code.`);
   if(!fit.length)fit.push('Little in the public record points to a clear strength — weak signal, not necessarily a weak engineer.');
   if(a.jdMatch&&a.jdMatch.claimedOnly.length)flags.push(`Claimed but not proven: ${a.jdMatch.claimedOnly.join(', ')}. LinkedIn only — verify in interview.`);
@@ -514,6 +545,8 @@ function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,soci
   if(!a.contrib&&!a.hasToken)flags.push('Basic mode: commits estimated, languages use primary-language only. Add a token for exact numbers.');
   if(a.emptyPct>=40)flags.push(`~${a.emptyPct}% of repos look like empty/placeholder projects.`);
   if(a.originalPct<40&&repos.length>=6)flags.push(`Only ${a.originalPct}% original repos — rest are forks.`);
+  if(a.learnPct>=40)flags.push(`~${a.learnPct}% of repos look like tutorial/practice/clone projects (by name). Discounted in the score — don't count them as real output.`);
+  if(a.collabMeasured&&a.collab.externalPRs===0&&a.collab.authoredPRs>0)flags.push('No PRs to repos they don\u2019t own in the recent sample — mostly solo work. Fine for some roles, worth probing for team collaboration.');
   if(a.owned.length<3)flags.push('Very few public repos — ask for private/work samples.');
 
   const compRows=Object.keys(a.weights).map(k=>{const v=Math.round(a.comps[k]*10)/10;return `<div class="bd"><div class="bk">${k} · ${Math.round(a.weights[k]*100)}%</div><div class="bv" style="color:${scoreColor(v)}">${v}<span style="font-size:11px;color:var(--faint)">/10</span></div></div>`;}).join('');
@@ -521,6 +554,15 @@ function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,soci
   const skillBars=a.skills.map(s=>`<div class="bar"><div class="lab"><span>${s.name}</span><span class="p">${s.pct}% of repos</span></div><div class="track"><div class="fill" style="width:${s.pct}%;background:var(--amber)"></div></div></div>`).join('')||'<div class="status">No framework/tool signals detected.</div>';
   const repoRows=a.topRepos.map(r=>`<div class="repo"><div><div class="rn">${r.name}</div><div class="rd">${r.description?r.description.slice(0,90):'\u2014 no description \u2014'}</div></div><div class="rs">\u2605 ${fmt(r.stargazers_count)}<br>${r.language||''}</div></div>`).join('')||'<div class="status">No repositories.</div>';
   const contribSection=a.contrib?`<section><div class="sh">Contribution activity <span class="pill">GraphQL · verified</span></div><div class="grid" style="margin-bottom:16px"><div class="stat"><div class="k">Total contributions</div><div class="v">${fmt(a.totalContrib)}</div><div class="s">last 12 months</div></div><div class="stat"><div class="k">Commits</div><div class="v">${fmt(a.commits)}</div><div class="s">12 mo (public)</div></div><div class="stat"><div class="k">Private contributions</div><div class="v" style="color:${a.privateCount>0?'var(--amber)':'var(--muted)'}">${fmt(a.privateCount)}</div><div class="s">hidden work count</div></div><div class="stat"><div class="k">Current streak</div><div class="v">${a.streak}</div><div class="s">consecutive days</div></div></div>${heatmap(a.calendar)}</section>`:'';
+  const collabSection=a.collabMeasured?`<section><div class="sh">Collaboration & open source <span class="pill est">via PR search</span></div>
+    <div class="grid" style="margin-bottom:16px">
+      <div class="stat"><div class="k">PRs authored</div><div class="v">${fmt(a.collab.authoredPRs)}</div><div class="s">across GitHub</div></div>
+      <div class="stat"><div class="k">Merged PRs</div><div class="v">${a.collab.mergedPRs!=null?fmt(a.collab.mergedPRs):'—'}</div><div class="s">accepted work</div></div>
+      <div class="stat"><div class="k">External repos</div><div class="v">${a.collab.distinctExternal}</div><div class="s">not their own</div></div>
+      <div class="stat"><div class="k">External PRs</div><div class="v">${fmt(a.collab.externalPRs)}</div><div class="s">recent sample</div></div>
+    </div>
+    ${a.collab.notable.filter(n=>n.stars>0).length?`<div class="sh" style="margin-bottom:10px">Notable projects they've contributed to</div>`+a.collab.notable.filter(n=>n.stars>0).map(n=>`<div class="repo"><div class="rn">${n.full}</div><div class="rs">\u2605 ${fmt(n.stars)} · ${n.prs} PR${n.prs>1?'s':''}</div></div>`).join(''):'<div class="status">No external repositories in the recent PR sample.</div>'}
+    <div class="legend">Merged PRs to repos they don't own — especially popular ones — is a stronger seniority signal than solo repo count. Based on their last ~100 authored PRs, so it's a recent sample, not full history.</div></section>`:'';
   const headlineFit=a.jdMatch?`<div class="vrow"><span class="vk">JD match</span><span class="vv" style="color:${pctColor(a.jdMatch.matchPct)}">${a.jdMatch.matchPct}% (${a.jdMatch.provenCount}/${a.jdMatch.total} proven)</span></div>`:'';
 
   const aibar=`<div class="aibar"><span class="lead">Explore deeper</span>
@@ -556,6 +598,7 @@ function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,soci
     ${contactSection(profile,social)}
     ${jdSection(a)}
     ${contribSection}
+    ${collabSection}
     <section><div class="sh">Frontend vs Backend <span class="pill${a.deepLang?'':' est'}">${a.deepLang?'byte-level · exact':'primary-language · estimate'}</span></div><div class="split"><div style="width:${a.fePct}%;background:var(--barfill)">${a.fePct>12?'FE '+a.fePct+'%':''}</div><div style="width:${a.bePct}%;background:var(--green)">${a.bePct>12?'BE '+a.bePct+'%':''}</div></div><div class="splitleg"><span>Frontend <b>${a.fePct}%</b></span><span>Backend <b>${a.bePct}%</b></span><span>Lean: <b>${a.lean}</b></span></div></section>
     <section><div class="sh">Primary languages <span class="pill${a.deepLang?'':' est'}">${a.deepLang?'by bytes':'by repo count'}</span></div>${langBars}</section>
     <section><div class="sh">Skills detected in code (frameworks · tools · infra)</div>${skillBars}</section>
