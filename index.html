@@ -13,7 +13,7 @@
     --text:#e7e9ee; --muted:#8b93a2; --faint:#5c6472;
     --amber:#ffb454; --amber-dim:#3a2f1a;
     --red:#f2555a; --orange:#ff8a4c; --yellow:#f5c451; --green:#4bd08b;
-    --barfill:#6f8cff;
+    --barfill:#6f8cff; --claim:#c58af9; --blue:#5b9dff;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
     --disp:'Space Grotesk',system-ui,sans-serif;
     --body:'Inter',system-ui,sans-serif;
@@ -21,6 +21,7 @@
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);
     -webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:var(--amber)}
   .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 80px}
 
   .top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;
@@ -28,24 +29,34 @@
   .brand h1{font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:-.02em;margin:0}
   .brand .tag{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
   .brand .amber{color:var(--amber)}
-  .mode{font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);
-    color:var(--faint);white-space:nowrap}
+  .mode{font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);color:var(--faint);white-space:nowrap}
   .mode.deep{color:var(--green);border-color:#1e3b2b;background:#12261b}
   .mode.basic{color:var(--yellow);border-color:#3a3418;background:#221f10}
 
   .search{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-  .field{flex:1;min-width:220px;display:flex;align-items:center;background:var(--panel);
-    border:1px solid var(--border);border-radius:10px;padding:0 12px}
+  .field{flex:1;min-width:220px;display:flex;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:0 12px}
   .field span{font-family:var(--mono);color:var(--faint);font-size:14px}
-  .field input{flex:1;background:none;border:none;outline:none;color:var(--text);
-    font-family:var(--mono);font-size:15px;padding:13px 6px}
-  .btn{background:var(--amber);color:#1a1206;border:none;border-radius:10px;padding:13px 22px;
-    font-family:var(--disp);font-weight:700;font-size:14px;cursor:pointer}
+  .field input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:var(--mono);font-size:15px;padding:13px 6px}
+  .btn{background:var(--amber);color:#1a1206;border:none;border-radius:10px;padding:13px 22px;font-family:var(--disp);font-weight:700;font-size:14px;cursor:pointer}
   .btn:hover{filter:brightness(1.06)}
   .btn:disabled{opacity:.5;cursor:default}
-  .tokrow{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-  .tokrow input{flex:1;min-width:180px;background:var(--panel);border:1px solid var(--border);
-    border-radius:8px;padding:9px 11px;color:var(--muted);font-family:var(--mono);font-size:12px;outline:none}
+  .tokrow{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .tokrow input[type=password]{flex:1;min-width:180px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:9px 11px;color:var(--muted);font-family:var(--mono);font-size:12px;outline:none}
+  .remember{font-family:var(--mono);font-size:11px;color:var(--faint);display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer}
+
+  details.role{background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;padding:0 14px}
+  details.role summary{cursor:pointer;padding:13px 0;font-family:var(--mono);font-size:12px;color:var(--amber);letter-spacing:.04em;list-style:none;display:flex;justify-content:space-between;align-items:center}
+  details.role summary::-webkit-details-marker{display:none}
+  .sumlabel::before{content:'\25B8 ';color:var(--faint)}
+  details.role[open] .sumlabel::before{content:'\25BE '}
+  .clearjd{font-family:var(--mono);font-size:10px;color:var(--faint);text-decoration:underline;cursor:pointer}
+  .rolegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 0 16px}
+  .rolegrid label{font-family:var(--mono);font-size:11px;color:var(--faint);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+  .rolegrid .saved{color:var(--green)}
+  .rolegrid textarea{width:100%;min-height:120px;resize:vertical;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:var(--body);font-size:13px;outline:none;line-height:1.5}
+  .rolegrid textarea:focus{border-color:var(--amber)}
+  @media(max-width:640px){.rolegrid{grid-template-columns:1fr}}
+
   .hint{font-family:var(--mono);font-size:11px;color:var(--faint);margin-bottom:22px;line-height:1.6}
   .hint b{color:var(--amber)}
 
@@ -69,6 +80,12 @@
   .sh .pill{color:var(--green);border:1px solid #1e3b2b;padding:2px 7px;border-radius:12px;margin-left:8px;letter-spacing:.05em}
   .sh .pill.est{color:var(--yellow);border-color:#3a3418}
 
+  .contact{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+  .cc{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:11px 13px}
+  .cc .k{font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+  .cc .v{font-size:13px;margin-top:4px;word-break:break-all}
+  .cc a{color:var(--blue)}
+
   .bar{margin-bottom:11px}
   .bar .lab{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
   .bar .lab .p{font-family:var(--mono);color:var(--muted);font-size:12px}
@@ -90,8 +107,25 @@
   .heatleg{display:flex;gap:6px;align-items:center;font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px}
   .heatleg i{width:11px;height:11px;border-radius:2px;display:inline-block}
 
-  .verdict{background:linear-gradient(160deg,#1a1e27,#12151b);border:1px solid var(--amber-dim);
-    border-radius:16px;overflow:hidden;margin-bottom:16px}
+  .jdhead{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+  .jddonut{position:relative;width:96px;height:96px;flex-shrink:0}
+  .jddonut .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .jddonut .lbl b{font-family:var(--disp);font-size:26px;font-weight:700}
+  .jddonut .lbl s{font-family:var(--mono);font-size:9px;color:var(--faint);text-decoration:none;letter-spacing:.1em}
+  .jdsum{font-size:14px;flex:1;min-width:220px}
+  table.matrix{width:100%;border-collapse:collapse;font-size:13px}
+  table.matrix th{font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;text-align:center;padding:8px 6px;border-bottom:1px solid var(--border)}
+  table.matrix th:first-child{text-align:left}
+  table.matrix td{padding:9px 6px;border-bottom:1px solid var(--border);text-align:center}
+  table.matrix td:first-child{text-align:left;font-weight:500}
+  .dot{display:inline-block;width:16px;height:16px;line-height:16px;border-radius:50%;font-size:11px;font-family:var(--mono)}
+  .yes{color:var(--green)} .no{color:var(--faint)} .claimdot{color:var(--claim)}
+  .vtag{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:12px}
+  .vtag.proven{color:var(--green);background:#12261b} .vtag.claimed{color:var(--claim);background:#241833}
+  .vtag.gap{color:var(--red);background:#2a1517} .vtag.bonus{color:var(--muted);background:var(--panel2)}
+  .legend{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:12px;line-height:1.7}
+
+  .verdict{background:linear-gradient(160deg,#1a1e27,#12151b);border:1px solid var(--amber-dim);border-radius:16px;overflow:hidden;margin-bottom:16px}
   .vtop{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--border)}
   .vscore{padding:26px 30px;text-align:center;border-right:1px solid var(--border);min-width:160px}
   .vscore .num{font-family:var(--disp);font-weight:700;font-size:56px;line-height:1}
@@ -110,8 +144,15 @@
   .bd{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
   .bd .bk{font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
   .bd .bv{font-family:var(--disp);font-weight:700;font-size:17px;margin-top:3px}
-  .caveat{background:var(--amber-dim);border-radius:8px;padding:12px 14px;font-size:12.5px;
-    color:#f0d9ad;margin-top:14px;line-height:1.6}
+  .caveat{background:var(--amber-dim);border-radius:8px;padding:12px 14px;font-size:12.5px;color:#f0d9ad;margin-top:14px;line-height:1.6}
+
+  .aibar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:16px}
+  .aibar .lead{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.12em;text-transform:uppercase;margin-right:6px}
+  .aibtn{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:9px;padding:10px 16px;font-family:var(--disp);font-weight:500;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  .aibtn:hover{border-color:var(--amber)}
+  .aibtn.claude{background:#2a1a10;border-color:#4a2f18;color:#ffb454}
+  .aibtn.gpt{background:#0f2018;border-color:#1e3b2b;color:#7fe0aa}
+  .ainote{font-family:var(--mono);font-size:10px;color:var(--faint);width:100%;margin-top:2px}
 
   .hidden{display:none}
   @media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}.vscore{border-right:none;border-bottom:1px solid var(--border);width:100%}}
@@ -124,7 +165,7 @@
   <div class="top">
     <div class="brand">
       <h1>GitHub <span class="amber">Scout</span></h1>
-      <div class="tag">Candidate signal report · evidence, not flattery</div>
+      <div class="tag">GitHub · LinkedIn · JD match · AI explore</div>
     </div>
     <div id="modeBadge" class="mode basic">Basic mode — no token</div>
   </div>
@@ -137,11 +178,27 @@
   </div>
   <div class="tokrow">
     <input id="token" type="password" placeholder="GitHub token — unlocks deep mode (real commits, private counts, exact languages)" autocomplete="off">
+    <label class="remember"><input type="checkbox" id="remtoken"> remember token on this device</label>
   </div>
+
+  <details class="role" id="roleBox">
+    <summary><span class="sumlabel">Match against a role — paste LinkedIn text + a job description</span>
+      <span class="clearjd" id="clearJd">clear saved JD</span></summary>
+    <div class="rolegrid">
+      <div>
+        <label>LinkedIn profile text — self-reported (not saved)</label>
+        <textarea id="linkedin" placeholder="Open the candidate's LinkedIn, copy About / Experience / Skills, paste here. LinkedIn has no public API and blocks scraping, so paste is the compliant way. This box is per-candidate and is not saved."></textarea>
+      </div>
+      <div>
+        <label>Job description <span class="saved" id="jdSaved"></span></label>
+        <textarea id="jd" placeholder="Paste the JD once. It's saved on this device and reloads automatically next time."></textarea>
+      </div>
+    </div>
+  </details>
+
   <div class="hint">
-    <b>Basic mode</b> (no token): public repos, primary-language estimate, ~60 requests/hr.<br>
-    <b>Deep mode</b> (with token): true byte-level languages · real 12-month commit count · private-contribution counts · contribution heatmap · 5000 requests/hr.<br>
-    A classic token needs no scopes for public data; add <b>repo</b> scope only if you want private counts. Token stays in your browser and is sent only to GitHub.
+    <b>Basic</b> (no token): public repos, ~60/hr. <b>Deep</b> (with token): byte-level languages · real commits · private counts · heatmap · 5000/hr.
+    Token, saved JD, and pasted text stay in your browser only.
   </div>
 
   <div id="status" class="status"></div>
@@ -152,306 +209,250 @@
 const $ = id => document.getElementById(id);
 const status = $('status'), report = $('report');
 
-const FE = new Set(['JavaScript','TypeScript','HTML','CSS','SCSS','Less','Vue','Svelte','Elm','CoffeeScript','Astro','Handlebars']);
-const BE = new Set(['Python','Java','Go','Ruby','PHP','C#','Rust','Kotlin','Scala','Elixir','C','C++','Clojure','Perl','Haskell','Erlang','Crystal','OCaml','F#','Groovy','Zig']);
-const MOBILE = new Set(['Swift','Objective-C','Dart','Kotlin']);
-const DATA = new Set(['Jupyter Notebook','R','MATLAB','Julia','Stata','SAS']);
+/* ---------- persistence (works on deployed site / local file; no-op in sandbox) ---------- */
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
 
-const SKILLS = {
-  'React':['react','next','nextjs','gatsby','redux','remix'],
-  'Vue / Nuxt':['vue','nuxt','vuex'],
-  'Angular':['angular','ngrx'],
-  'Svelte':['svelte','sveltekit'],
-  'Node.js':['node','nodejs','express','nestjs','fastify'],
-  'Django / Flask / FastAPI':['django','flask','fastapi'],
-  'Spring / JVM':['spring','springboot','micronaut','quarkus'],
-  'Rails':['rails','ruby-on-rails'],
-  'Laravel / PHP':['laravel','symfony'],
-  'Go backend':['gin','fiber','echo','grpc-go'],
-  'Docker':['docker','dockerfile','container'],
-  'Kubernetes':['kubernetes','k8s','helm','kubectl'],
-  'Terraform / IaC':['terraform','pulumi','ansible','iac'],
-  'AWS / Cloud':['aws','gcp','azure','cloudflare','serverless','lambda'],
-  'GraphQL':['graphql','apollo'],
-  'Databases':['postgres','postgresql','mysql','mongodb','redis','sqlite','prisma'],
-  'ML / AI':['tensorflow','pytorch','machine-learning','deep-learning','llm','nlp','transformers','ml'],
-  'CI/CD':['github-actions','ci','cd','jenkins','circleci','gitlab-ci'],
-  'Testing':['jest','pytest','cypress','playwright','testing','vitest'],
-  'Mobile':['flutter','react-native','ios','android','swiftui'],
-};
-
-async function gh(path, token){
-  const h = {'Accept':'application/vnd.github+json'};
-  if(token) h['Authorization'] = 'token '+token;
-  const r = await fetch('https://api.github.com'+path,{headers:h});
-  if(r.status===404) throw {code:404};
-  if(r.status===401) throw {code:401};
-  if(r.status===403){ const rem=r.headers.get('x-ratelimit-remaining'); throw {code:403,rem}; }
-  if(!r.ok) throw {code:r.status};
-  return r.json();
-}
-
-async function graphql(login, token){
-  const q = `query($login:String!){
-    user(login:$login){
-      contributionsCollection{
-        totalCommitContributions
-        totalPullRequestContributions
-        totalPullRequestReviewContributions
-        totalIssueContributions
-        restrictedContributionsCount
-        contributionCalendar{
-          totalContributions
-          weeks{ contributionDays{ date contributionCount weekday } }
-        }
-      }
-    }
-  }`;
-  const r = await fetch('https://api.github.com/graphql',{
-    method:'POST',
-    headers:{'Authorization':'bearer '+token,'Content-Type':'application/json'},
-    body:JSON.stringify({query:q,variables:{login}})
-  });
-  const d = await r.json();
-  if(d.errors || !d.data || !d.data.user) return null;
-  return d.data.user.contributionsCollection;
-}
-
-async function fetchByteLanguages(owned, token){
-  const targets = [...owned].sort((a,b)=>new Date(b.pushed_at)-new Date(a.pushed_at)).slice(0,50);
-  const totals = {};
-  for(let i=0;i<targets.length;i+=8){
-    const batch = targets.slice(i,i+8);
-    status.textContent = `Analysing languages… ${Math.min(i+8,targets.length)}/${targets.length} repos`;
-    const results = await Promise.all(batch.map(r=>
-      gh(`/repos/${r.full_name}/languages`, token).catch(()=>({}))
-    ));
-    results.forEach(res=>{ for(const [l,b] of Object.entries(res)) totals[l]=(totals[l]||0)+b; });
-  }
-  return totals;
-}
-
-const fmt = n => (n==null)?'0':(n>=1000 ? (n/1000).toFixed(n>=10000?0:1)+'k' : ''+n);
-const pct = (a,b) => b? Math.round(a/b*100):0;
-const daysBetween = (a,b)=>Math.round((a-b)/86400000);
-function scoreColor(v){ if(v>=7.5)return 'var(--green)'; if(v>=5)return 'var(--yellow)'; if(v>=3)return 'var(--orange)'; return 'var(--red)'; }
-
-$('token').addEventListener('input',()=>{
-  const has=$('token').value.trim(); const b=$('modeBadge');
-  b.className='mode '+(has?'deep':'basic');
-  b.textContent=has?'Deep mode — token active':'Basic mode — no token';
+document.addEventListener('DOMContentLoaded',()=>{
+  const savedJd=lsGet('scout_jd'); if(savedJd){$('jd').value=savedJd;$('roleBox').open=true;$('jdSaved').textContent='· saved ✓';}
+  const rem=lsGet('scout_remember')==='1';
+  if(rem){$('remtoken').checked=true; const t=lsGet('scout_token'); if(t){$('token').value=t; syncMode();}}
 });
-$('go').onclick = run;
+$('jd').addEventListener('input',()=>{const v=$('jd').value;if(v.trim()){lsSet('scout_jd',v);$('jdSaved').textContent='· saved ✓';}else{lsDel('scout_jd');$('jdSaved').textContent='';}});
+$('clearJd').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();$('jd').value='';lsDel('scout_jd');$('jdSaved').textContent='';});
+$('remtoken').addEventListener('change',()=>{if($('remtoken').checked){lsSet('scout_remember','1');lsSet('scout_token',$('token').value.trim());}else{lsDel('scout_remember');lsDel('scout_token');}});
+
+const FE=new Set(['JavaScript','TypeScript','HTML','CSS','SCSS','Less','Vue','Svelte','Elm','CoffeeScript','Astro','Handlebars']);
+const BE=new Set(['Python','Java','Go','Ruby','PHP','C#','Rust','Kotlin','Scala','Elixir','C','C++','Clojure','Perl','Haskell','Erlang','Crystal','OCaml','F#','Groovy','Zig']);
+const MOBILE=new Set(['Swift','Objective-C','Dart','Kotlin']);
+const DATA=new Set(['Jupyter Notebook','R','MATLAB','Julia','Stata','SAS']);
+const SKILLS={
+  'React':['react','next.js','nextjs','next','gatsby','redux','remix'],'Vue / Nuxt':['vue','nuxt','vuex'],
+  'Angular':['angular','ngrx'],'Svelte':['svelte','sveltekit'],
+  'Node.js':['node.js','nodejs','node','express','nestjs','fastify'],
+  'Django / Flask / FastAPI':['django','flask','fastapi'],'Spring / JVM':['spring','springboot','spring boot','micronaut','quarkus'],
+  'Rails':['rails','ruby on rails','ruby-on-rails'],'Laravel / PHP':['laravel','symfony'],
+  'Docker':['docker','dockerfile','container','containers'],'Kubernetes':['kubernetes','k8s','helm','kubectl'],
+  'Terraform / IaC':['terraform','pulumi','ansible','iac','infrastructure as code'],'AWS / Cloud':['aws','gcp','azure','cloudflare','serverless','lambda'],
+  'GraphQL':['graphql','apollo'],'Databases':['postgres','postgresql','mysql','mongodb','redis','sqlite','prisma','dynamodb'],
+  'ML / AI':['tensorflow','pytorch','machine learning','machine-learning','deep learning','deep-learning','llm','nlp','transformers'],
+  'CI/CD':['github actions','github-actions','ci/cd','jenkins','circleci','gitlab-ci'],'Testing':['jest','pytest','cypress','playwright','vitest','unit testing'],
+  'Mobile':['flutter','react native','react-native','ios','android','swiftui'],'Kafka / streaming':['kafka','rabbitmq','pubsub','event streaming'],
+  'Microservices':['microservice','microservices','distributed systems','system design'],
+};
+const LANGS={'JavaScript':['javascript','js'],'TypeScript':['typescript','ts'],'Python':['python'],'Go':['golang','go'],'Java':['java'],'Ruby':['ruby'],'PHP':['php'],'C#':['c#','csharp','.net','dotnet'],'Rust':['rust'],'Kotlin':['kotlin'],'Swift':['swift'],'Scala':['scala'],'Elixir':['elixir'],'C++':['c++','cpp'],'C':['c'],'Dart':['dart']};
+const CANON=[];for(const[n,keys]of Object.entries(SKILLS))CANON.push({name:n,keys});for(const[n,keys]of Object.entries(LANGS))CANON.push({name:n,keys,isLang:true});
+function esc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function textHas(t,key){return new RegExp('(^|[^a-z0-9+#.])'+esc(key.toLowerCase())+'([^a-z0-9+#]|$)','i').test(t);}
+function presentSkills(text){const low=' '+(text||'').toLowerCase()+' ';const set=new Set();CANON.forEach(c=>{if(c.keys.some(k=>textHas(low,k)))set.add(c.name);});return set;}
+
+async function gh(path,token){const h={'Accept':'application/vnd.github+json'};if(token)h['Authorization']='token '+token;
+  const r=await fetch('https://api.github.com'+path,{headers:h});
+  if(r.status===404)throw{code:404};if(r.status===401)throw{code:401};
+  if(r.status===403){throw{code:403,rem:r.headers.get('x-ratelimit-remaining')};}
+  if(!r.ok)throw{code:r.status};return r.json();}
+async function graphql(login,token){
+  const q=`query($login:String!){user(login:$login){contributionsCollection{totalCommitContributions totalPullRequestContributions totalIssueContributions restrictedContributionsCount contributionCalendar{totalContributions weeks{contributionDays{date contributionCount}}}}}}`;
+  const r=await fetch('https://api.github.com/graphql',{method:'POST',headers:{'Authorization':'bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({query:q,variables:{login}})});
+  const d=await r.json();if(d.errors||!d.data||!d.data.user)return null;return d.data.user.contributionsCollection;}
+async function fetchByteLanguages(owned,token){
+  const targets=[...owned].sort((a,b)=>new Date(b.pushed_at)-new Date(a.pushed_at)).slice(0,50);const totals={};
+  for(let i=0;i<targets.length;i+=8){const batch=targets.slice(i,i+8);status.textContent=`Analysing languages… ${Math.min(i+8,targets.length)}/${targets.length} repos`;
+    const res=await Promise.all(batch.map(r=>gh(`/repos/${r.full_name}/languages`,token).catch(()=>({}))));res.forEach(o=>{for(const[l,b]of Object.entries(o))totals[l]=(totals[l]||0)+b;});}
+  return totals;}
+
+const fmt=n=>(n==null)?'0':(n>=1000?(n/1000).toFixed(n>=10000?0:1)+'k':''+n);
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+const daysBetween=(a,b)=>Math.round((a-b)/86400000);
+function scoreColor(v){if(v>=7.5)return'var(--green)';if(v>=5)return'var(--yellow)';if(v>=3)return'var(--orange)';return'var(--red)';}
+function pctColor(v){if(v>=75)return'var(--green)';if(v>=50)return'var(--yellow)';if(v>=30)return'var(--orange)';return'var(--red)';}
+
+function syncMode(){const has=$('token').value.trim();const b=$('modeBadge');b.className='mode '+(has?'deep':'basic');b.textContent=has?'Deep mode — token active':'Basic mode — no token';}
+$('token').addEventListener('input',()=>{syncMode();if($('remtoken').checked)lsSet('scout_token',$('token').value.trim());});
+$('go').onclick=run;
 $('user').addEventListener('keydown',e=>{if(e.key==='Enter')run();});
 
 async function run(){
-  const u = $('user').value.trim().replace(/^@/,'').replace(/.*github\.com\//,'').replace(/\/.*/,'');
-  const token = $('token').value.trim();
-  if(!u){ status.textContent='Enter a username.'; return; }
-  report.classList.add('hidden'); status.className='status';
-  status.textContent='Fetching profile…'; $('go').disabled=true;
-
+  const u=$('user').value.trim().replace(/^@/,'').replace(/.*github\.com\//,'').replace(/\/.*/,'');
+  const token=$('token').value.trim(), linkedin=$('linkedin').value.trim(), jd=$('jd').value.trim();
+  if(!u){status.textContent='Enter a username.';return;}
+  report.classList.add('hidden');status.className='status';status.textContent='Fetching profile…';$('go').disabled=true;
   try{
-    const profile = await gh('/users/'+encodeURIComponent(u), token);
-
+    const profile=await gh('/users/'+encodeURIComponent(u),token);
+    let social=[];try{social=await gh(`/users/${u}/social_accounts`,token);}catch(e){social=[];}
     status.textContent='Fetching repositories…';
-    let repos=[], page=1;
-    while(page<=3){
-      const batch = await gh(`/users/${u}/repos?per_page=100&sort=pushed&page=${page}`, token);
-      repos = repos.concat(batch);
-      if(batch.length<100) break;
-      page++;
-    }
-    const owned = repos.filter(r=>!r.fork);
-
+    let repos=[],page=1;while(page<=3){const b=await gh(`/users/${u}/repos?per_page=100&sort=pushed&page=${page}`,token);repos=repos.concat(b);if(b.length<100)break;page++;}
+    const owned=repos.filter(r=>!r.fork);
     status.textContent='Reading recent activity…';
-    let events=[];
-    try{ events = await gh(`/users/${u}/events/public?per_page=100`, token);}catch(e){events=[];}
-
-    let contrib=null, byteLangs=null;
-    if(token){
-      status.textContent='Pulling contribution history (GraphQL)…';
-      try{ contrib = await graphql(u, token); }catch(e){ contrib=null; }
-      try{ byteLangs = await fetchByteLanguages(owned, token); }catch(e){ byteLangs=null; }
-    }
-
+    let events=[];try{events=await gh(`/users/${u}/events/public?per_page=100`,token);}catch(e){events=[];}
+    let contrib=null,byteLangs=null;
+    if(token){status.textContent='Pulling contribution history (GraphQL)…';try{contrib=await graphql(u,token);}catch(e){}try{byteLangs=await fetchByteLanguages(owned,token);}catch(e){}}
     status.textContent='';
-    render(profile, repos, events, contrib, byteLangs, !!token);
-    report.classList.remove('hidden');
-    report.scrollIntoView({behavior:'smooth',block:'start'});
+    render(profile,repos,events,contrib,byteLangs,!!token,linkedin,jd,social);
+    report.classList.remove('hidden');report.scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){
     status.className='status err';
-    if(e.code===404) status.textContent='No GitHub user with that name.';
-    else if(e.code===401) status.textContent='Token rejected by GitHub — check it, or clear it to run basic mode.';
-    else if(e.code===403) status.textContent='GitHub rate limit hit'+(e.rem==='0'?' (0 left this hour). Add a token to continue.':'. Add a token.');
+    if(e.code===404)status.textContent='No GitHub user with that name.';
+    else if(e.code===401)status.textContent='Token rejected by GitHub — check it, or clear it to run basic mode.';
+    else if(e.code===403)status.textContent='GitHub rate limit hit'+(e.rem==='0'?' (0 left this hour). Add a token to continue.':'. Add a token.');
     else status.textContent='Something went wrong reaching GitHub ('+(e.code||'network')+'). Try again.';
-  }finally{ $('go').disabled=false; }
+  }finally{$('go').disabled=false;}
 }
 
-function analyse(profile, repos, events, contrib, byteLangs, hasToken){
-  const now = Date.now();
-  const owned = repos.filter(r=>!r.fork);
-  const forks = repos.filter(r=>r.fork);
-  const deepLang = byteLangs && Object.keys(byteLangs).length>0;
-
+function analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd){
+  const now=Date.now();const owned=repos.filter(r=>!r.fork),forks=repos.filter(r=>r.fork);
+  const deepLang=byteLangs&&Object.keys(byteLangs).length>0;
   let langs;
-  if(deepLang){
-    const total = Object.values(byteLangs).reduce((a,b)=>a+b,0)||1;
-    langs = Object.entries(byteLangs).sort((a,b)=>b[1]-a[1]).map(([n,b])=>({name:n,pct:Math.round(b/total*100),bytes:b}));
-  } else {
-    const lc={}; owned.forEach(r=>{ if(r.language) lc[r.language]=(lc[r.language]||0)+1; });
-    const t=Object.values(lc).reduce((a,b)=>a+b,0);
-    langs=Object.entries(lc).sort((a,b)=>b[1]-a[1]).map(([n,c])=>({name:n,pct:pct(c,t),count:c}));
-  }
-
-  let fe=0,be=0,mob=0,data=0;
-  langs.forEach(l=>{ const w = deepLang? l.bytes : l.count;
-    if(FE.has(l.name)) fe+=w; if(BE.has(l.name)) be+=w;
-    if(MOBILE.has(l.name)) mob+=w; if(DATA.has(l.name)) data+=w; });
-  const febe = fe+be || 1;
-  const fePct = Math.round(fe/febe*100), bePct=100-fePct;
-  let lean;
-  if(data>febe*0.6) lean='Data / ML leaning';
-  else if(mob>febe*0.5) lean='Mobile leaning';
-  else if(fe && be && Math.abs(fePct-50)<=25) lean='Full-stack';
-  else if(fePct>bePct) lean='Frontend leaning';
-  else if(be) lean='Backend leaning';
-  else lean='Unclear (thin data)';
-
-  const skillHits={};
-  owned.forEach(r=>{ const hay=((r.name||'')+' '+(r.description||'')+' '+((r.topics||[]).join(' '))+' '+(r.language||'')).toLowerCase();
-    for(const [s,keys] of Object.entries(SKILLS)) if(keys.some(k=>hay.includes(k))) skillHits[s]=(skillHits[s]||0)+1; });
-  const skills = Object.entries(skillHits).sort((a,b)=>b[1]-a[1]).map(([n,c])=>({name:n,pct:pct(c,owned.length||1),count:c})).slice(0,12);
-
-  const stars = owned.reduce((a,r)=>a+r.stargazers_count,0);
-  const forksRecv = owned.reduce((a,r)=>a+r.forks_count,0);
-  const topStars = owned.reduce((m,r)=>Math.max(m,r.stargazers_count),0);
-  const topRepos = [...owned].sort((a,b)=>b.stargazers_count-a.stargazers_count).slice(0,5);
-
-  let commits, commitBasis, activeDays, daysSince, privateCount=null, totalContrib=null, streak=0, calendar=null;
-  if(contrib){
-    commits = contrib.totalCommitContributions; commitBasis='last 12 mo (real)';
-    privateCount = contrib.restrictedContributionsCount;
-    totalContrib = contrib.contributionCalendar.totalContributions;
-    calendar = contrib.contributionCalendar.weeks.flatMap(w=>w.contributionDays);
-    activeDays = calendar.filter(d=>d.contributionCount>0).length;
-    const active = calendar.filter(d=>d.contributionCount>0);
-    daysSince = active.length? daysBetween(now, new Date(active[active.length-1].date).getTime()) : 9999;
-    for(let i=calendar.length-1;i>=0;i--){ if(calendar[i].contributionCount>0) streak++; else if(streak>0) break; }
-  } else {
-    const pushes = events.filter(e=>e.type==='PushEvent');
-    commits = pushes.reduce((a,e)=>a+(e.payload?.size||0),0); commitBasis='recent window (est.)';
-    activeDays = [...new Set(events.map(e=>e.created_at?.slice(0,10)))].filter(Boolean).length;
-    const last = events.length? new Date(events[0].created_at).getTime() : (repos[0]? new Date(repos[0].pushed_at).getTime():0);
-    daysSince = last? daysBetween(now,last):9999;
-  }
-  const prs = contrib? contrib.totalPullRequestContributions : events.filter(e=>e.type==='PullRequestEvent').length;
-  const issues = contrib? contrib.totalIssueContributions : events.filter(e=>e.type==='IssuesEvent'||e.type==='IssueCommentEvent').length;
-
-  const ageDays = daysBetween(now, new Date(profile.created_at).getTime());
-  const ageYears = (ageDays/365).toFixed(1);
-  const followers = profile.followers, following = profile.following||0;
-  const originalPct = repos.length? pct(owned.length,repos.length):0;
-  const describedPct = owned.length? pct(owned.filter(r=>r.description).length,owned.length):0;
-  const emptyPct = owned.length? pct(owned.filter(r=>r.stargazers_count===0 && !r.description && r.size<50).length,owned.length):0;
-
-  const impact = Math.min(10, stars<=0?0.5 : Math.log10(stars)*2.4 + Math.min(topStars,1000)/500);
-  const recency = daysSince<=7?10:daysSince<=30?8:daysSince<=90?6:daysSince<=180?4:daysSince<=365?2:0.5;
-  const activity = Math.min(10, activeDays/(contrib?18:9) + commits/(contrib?120:25));
-  const originality = repos.length? Math.min(10, originalPct/12 + Math.min(owned.length,30)/6):1;
-  const breadth = Math.min(10, langs.length*1.1 + skills.length*0.6);
-  const tenure = Math.min(10, ageDays/365*1.6 + Math.min(followers,500)/80);
+  if(deepLang){const t=Object.values(byteLangs).reduce((a,b)=>a+b,0)||1;langs=Object.entries(byteLangs).sort((a,b)=>b[1]-a[1]).map(([n,b])=>({name:n,pct:Math.round(b/t*100),bytes:b}));}
+  else{const lc={};owned.forEach(r=>{if(r.language)lc[r.language]=(lc[r.language]||0)+1;});const t=Object.values(lc).reduce((a,b)=>a+b,0);langs=Object.entries(lc).sort((a,b)=>b[1]-a[1]).map(([n,c])=>({name:n,pct:pct(c,t),count:c}));}
+  let fe=0,be=0,mob=0,data=0;langs.forEach(l=>{const w=deepLang?l.bytes:l.count;if(FE.has(l.name))fe+=w;if(BE.has(l.name))be+=w;if(MOBILE.has(l.name))mob+=w;if(DATA.has(l.name))data+=w;});
+  const febe=fe+be||1,fePct=Math.round(fe/febe*100),bePct=100-fePct;
+  let lean;if(data>febe*0.6)lean='Data / ML leaning';else if(mob>febe*0.5)lean='Mobile leaning';else if(fe&&be&&Math.abs(fePct-50)<=25)lean='Full-stack';else if(fePct>bePct)lean='Frontend leaning';else if(be)lean='Backend leaning';else lean='Unclear (thin data)';
+  const ghBlob=owned.map(r=>(r.name||'')+' '+(r.description||'')+' '+((r.topics||[]).join(' '))+' '+(r.language||'')).join(' ')+' '+langs.map(l=>l.name).join(' ');
+  const ghProven=presentSkills(ghBlob);
+  const skillHits={};owned.forEach(r=>{const hay=((r.name||'')+' '+(r.description||'')+' '+((r.topics||[]).join(' '))+' '+(r.language||'')).toLowerCase();for(const[s,keys]of Object.entries(SKILLS))if(keys.some(k=>textHas(' '+hay+' ',k)))skillHits[s]=(skillHits[s]||0)+1;});
+  const skills=Object.entries(skillHits).sort((a,b)=>b[1]-a[1]).map(([n,c])=>({name:n,pct:pct(c,owned.length||1),count:c})).slice(0,12);
+  const linProven=linkedin?presentSkills(linkedin):new Set();const jdReq=jd?presentSkills(jd):new Set();
+  const stars=owned.reduce((a,r)=>a+r.stargazers_count,0),topStars=owned.reduce((m,r)=>Math.max(m,r.stargazers_count),0);
+  const topRepos=[...owned].sort((a,b)=>b.stargazers_count-a.stargazers_count).slice(0,5);
+  let commits,commitBasis,activeDays,daysSince,privateCount=null,totalContrib=null,streak=0,calendar=null;
+  if(contrib){commits=contrib.totalCommitContributions;commitBasis='last 12 mo (real)';privateCount=contrib.restrictedContributionsCount;totalContrib=contrib.contributionCalendar.totalContributions;calendar=contrib.contributionCalendar.weeks.flatMap(w=>w.contributionDays);activeDays=calendar.filter(d=>d.contributionCount>0).length;const act=calendar.filter(d=>d.contributionCount>0);daysSince=act.length?daysBetween(now,new Date(act[act.length-1].date).getTime()):9999;for(let i=calendar.length-1;i>=0;i--){if(calendar[i].contributionCount>0)streak++;else if(streak>0)break;}}
+  else{const pushes=events.filter(e=>e.type==='PushEvent');commits=pushes.reduce((a,e)=>a+(e.payload?.size||0),0);commitBasis='recent window (est.)';activeDays=[...new Set(events.map(e=>e.created_at?.slice(0,10)))].filter(Boolean).length;const last=events.length?new Date(events[0].created_at).getTime():(repos[0]?new Date(repos[0].pushed_at).getTime():0);daysSince=last?daysBetween(now,last):9999;}
+  const prs=contrib?contrib.totalPullRequestContributions:events.filter(e=>e.type==='PullRequestEvent').length;
+  const issues=contrib?contrib.totalIssueContributions:events.filter(e=>e.type==='IssuesEvent'||e.type==='IssueCommentEvent').length;
+  const ageDays=daysBetween(now,new Date(profile.created_at).getTime()),ageYears=(ageDays/365).toFixed(1);
+  const followers=profile.followers,following=profile.following||0;
+  const originalPct=repos.length?pct(owned.length,repos.length):0;
+  const emptyPct=owned.length?pct(owned.filter(r=>r.stargazers_count===0&&!r.description&&r.size<50).length,owned.length):0;
+  const impact=Math.min(10,stars<=0?0.5:Math.log10(stars)*2.4+Math.min(topStars,1000)/500);
+  const recency=daysSince<=7?10:daysSince<=30?8:daysSince<=90?6:daysSince<=180?4:daysSince<=365?2:0.5;
+  const activity=Math.min(10,activeDays/(contrib?18:9)+commits/(contrib?120:25));
+  const originality=repos.length?Math.min(10,originalPct/12+Math.min(owned.length,30)/6):1;
+  const breadth=Math.min(10,langs.length*1.1+skills.length*0.6);
+  const tenure=Math.min(10,ageDays/365*1.6+Math.min(followers,500)/80);
   const weights={Impact:0.30,Activity:0.18,Recency:0.14,Originality:0.14,Breadth:0.14,Tenure:0.10};
   const comps={Impact:impact,Activity:activity,Recency:recency,Originality:originality,Breadth:breadth,Tenure:tenure};
-  let score=0; for(const k in weights) score+=comps[k]*weights[k]; score=Math.round(score*10)/10;
-
-  let level, levelWhy;
+  let score=0;for(const k in weights)score+=comps[k]*weights[k];score=Math.round(score*10)/10;
+  let jdMatch=null;
+  if(jd&&jdReq.size){
+    const rows=[...jdReq].map(name=>{const g=ghProven.has(name),l=linProven.has(name);return{name,required:true,github:g,linkedin:l,verdict:g?'proven':(l?'claimed':'gap')};});
+    const provenCount=rows.filter(r=>r.verdict==='proven').length,claimedCount=rows.filter(r=>r.verdict==='claimed').length,gapCount=rows.filter(r=>r.verdict==='gap').length;
+    const matchPct=Math.round((provenCount*1+claimedCount*0.5)/rows.length*100);
+    const bonus=[...new Set([...ghProven,...linProven])].filter(n=>!jdReq.has(n)).map(name=>({name,required:false,github:ghProven.has(name),linkedin:linProven.has(name),verdict:'bonus'}));
+    jdMatch={rows,bonus,provenCount,claimedCount,gapCount,matchPct,total:rows.length,gaps:rows.filter(r=>r.verdict==='gap').map(r=>r.name),claimedOnly:rows.filter(r=>r.verdict==='claimed').map(r=>r.name)};
+  }
+  let level,levelWhy;
   const senior=[topStars>=200,ageDays>365*4,skills.length>=6,stars>=300].filter(Boolean).length;
   const mid=[topStars>=20,ageDays>365*2,skills.length>=3,owned.length>=8].filter(Boolean).length;
-  if(senior>=3){level='Senior / Staff signal';levelWhy='Sustained output, real project traction, broad stack over years.';}
-  else if(senior>=2||mid>=3){level='Mid → Senior signal';levelWhy='Solid independent projects and range; limited large-scale traction shown publicly.';}
-  else if(mid>=2){level='Junior → Mid signal';levelWhy='Real building activity, still light on impact and depth in public work.';}
-  else {level='Early / thin public signal';levelWhy='Not enough public evidence to place a level — early-career OR works mostly in private repos.';}
-
-  return {profile,owned,forks,langs,deepLang,fePct,bePct,lean,skills,stars,forksRecv,topStars,topRepos,
-    commits,commitBasis,activeDays,daysSince,privateCount,totalContrib,streak,calendar,prs,issues,
-    ageYears,ageDays,followers,following,originalPct,describedPct,emptyPct,score,comps,weights,level,levelWhy,hasToken,contrib:!!contrib};
+  if(senior>=3){level='Senior / Staff signal';levelWhy='Sustained output, real traction, broad stack over years.';}
+  else if(senior>=2||mid>=3){level='Mid → Senior signal';levelWhy='Solid independent projects and range; limited large-scale public traction.';}
+  else if(mid>=2){level='Junior → Mid signal';levelWhy='Real building activity, still light on impact/depth in public work.';}
+  else{level='Early / thin public signal';levelWhy='Not enough public evidence to place a level.';}
+  return {profile,owned,forks,langs,deepLang,fePct,bePct,lean,skills,stars,topStars,topRepos,commits,commitBasis,activeDays,daysSince,privateCount,totalContrib,streak,calendar,prs,issues,ageYears,ageDays,followers,following,originalPct,emptyPct,score,comps,weights,level,levelWhy,hasToken,contrib:!!contrib,ghProven,linProven,jdReq,jdMatch,hasLinkedin:!!linkedin,hasJd:!!jd,jdText:jd,linkedinText:linkedin};
 }
 
-function heatmap(cal){
-  if(!cal||!cal.length) return '';
-  const max = Math.max(...cal.map(d=>d.contributionCount),1);
-  const color=c=>{ if(c===0)return 'var(--panel2)'; const r=c/max;
-    if(r<=0.25)return '#5a3d12'; if(r<=0.5)return '#8a5c15'; if(r<=0.75)return '#cf8a1e'; return 'var(--amber)'; };
-  const cell=11, gap=2; const weeks=[];
-  for(let i=0;i<cal.length;i+=7) weeks.push(cal.slice(i,i+7));
-  const w = weeks.length*(cell+gap), h=7*(cell+gap);
-  let rects='';
-  weeks.forEach((wk,x)=> wk.forEach((d,y)=>{
-    rects+=`<rect x="${x*(cell+gap)}" y="${y*(cell+gap)}" width="${cell}" height="${cell}" rx="2" fill="${color(d.contributionCount)}"><title>${d.date}: ${d.contributionCount}</title></rect>`;
-  }));
-  return `<div class="heat"><svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${rects}</svg></div>
-    <div class="heatleg">Less <i style="background:var(--panel2)"></i><i style="background:#5a3d12"></i><i style="background:#8a5c15"></i><i style="background:#cf8a1e"></i><i style="background:var(--amber)"></i> More · last 12 months</div>`;
+function heatmap(cal){if(!cal||!cal.length)return'';const max=Math.max(...cal.map(d=>d.contributionCount),1);const color=c=>{if(c===0)return'var(--panel2)';const r=c/max;return r<=0.25?'#5a3d12':r<=0.5?'#8a5c15':r<=0.75?'#cf8a1e':'var(--amber)';};const cell=11,gap=2,weeks=[];for(let i=0;i<cal.length;i+=7)weeks.push(cal.slice(i,i+7));const w=weeks.length*(cell+gap),h=7*(cell+gap);let rects='';weeks.forEach((wk,x)=>wk.forEach((d,y)=>{rects+=`<rect x="${x*(cell+gap)}" y="${y*(cell+gap)}" width="${cell}" height="${cell}" rx="2" fill="${color(d.contributionCount)}"><title>${d.date}: ${d.contributionCount}</title></rect>`;}));return `<div class="heat"><svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${rects}</svg></div><div class="heatleg">Less <i style="background:var(--panel2)"></i><i style="background:#5a3d12"></i><i style="background:#8a5c15"></i><i style="background:#cf8a1e"></i><i style="background:var(--amber)"></i> More · last 12 months</div>`;}
+function donut(p){const c=pctColor(p),R=42,C=2*Math.PI*R,off=C*(1-p/100);return `<div class="jddonut"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="${R}" fill="none" stroke="var(--panel2)" stroke-width="9"/><circle cx="48" cy="48" r="${R}" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 48 48)"/></svg><div class="lbl"><b style="color:${c}">${p}%</b><s>JD MATCH</s></div></div>`;}
+
+function contactSection(profile,social){
+  const items=[];
+  items.push(`<div class="cc"><div class="k">GitHub</div><div class="v"><a href="${profile.html_url}" target="_blank" rel="noopener">${profile.html_url.replace('https://','')}</a></div></div>`);
+  if(profile.email)items.push(`<div class="cc"><div class="k">Email (public)</div><div class="v"><a href="mailto:${profile.email}">${profile.email}</a></div></div>`);
+  if(profile.blog){let b=profile.blog;if(!/^https?:/.test(b))b='https://'+b;items.push(`<div class="cc"><div class="k">Website / blog</div><div class="v"><a href="${b}" target="_blank" rel="noopener">${profile.blog}</a></div></div>`);}
+  if(profile.twitter_username)items.push(`<div class="cc"><div class="k">X / Twitter</div><div class="v"><a href="https://x.com/${profile.twitter_username}" target="_blank" rel="noopener">@${profile.twitter_username}</a></div></div>`);
+  if(profile.company)items.push(`<div class="cc"><div class="k">Company</div><div class="v">${profile.company}</div></div>`);
+  if(profile.location)items.push(`<div class="cc"><div class="k">Location</div><div class="v">${profile.location}</div></div>`);
+  if(profile.hireable)items.push(`<div class="cc"><div class="k">Status</div><div class="v" style="color:var(--green)">Marked open to work</div></div>`);
+  (social||[]).forEach(s=>{if(s&&s.url)items.push(`<div class="cc"><div class="k">${(s.provider||'link').replace('_',' ')}</div><div class="v"><a href="${s.url}" target="_blank" rel="noopener">${s.url.replace(/^https?:\/\//,'')}</a></div></div>`);});
+  return `<section><div class="sh">Contact & links <span class="pill est">public only</span></div><div class="contact">${items.join('')}</div>
+    <div class="legend">Only what the candidate has made public on GitHub. Blank fields mean they didn't publish it — not that it doesn't exist.</div></section>`;
 }
 
-function render(profile, repos, events, contrib, byteLangs, hasToken){
-  const a = analyse(profile, repos, events, contrib, byteLangs, hasToken);
-  const sc=a.score, col=scoreColor(sc);
+function jdSection(a){
+  if(!a.jdMatch)return'';const m=a.jdMatch;
+  const vtag=v=>`<span class="vtag ${v}">${v==='proven'?'Proven (GitHub)':v==='claimed'?'Claimed (LinkedIn)':v==='gap'?'Gap':'Bonus'}</span>`;
+  const yn=(b,cls)=>b?`<span class="dot ${cls}">\u25CF</span>`:`<span class="dot no">\u2013</span>`;
+  const rowHtml=r=>`<tr><td>${r.name}</td><td>${r.required?'<span class="dot yes">\u25CF</span>':'<span class="dot no">\u2013</span>'}</td><td>${yn(r.github,'yes')}</td><td>${yn(r.linkedin,'claimdot')}</td><td>${vtag(r.verdict)}</td></tr>`;
+  const bonusRows=m.bonus.slice(0,8).map(rowHtml).join('');
+  let summary;
+  if(m.matchPct>=75)summary=`Strong match. ${m.provenCount} of ${m.total} required skills are <b>proven in code</b>${m.claimedCount?`, ${m.claimedCount} more only claimed on LinkedIn`:''}.`;
+  else if(m.matchPct>=50)summary=`Partial match. ${m.provenCount} proven, ${m.claimedCount} claimed-only, ${m.gapCount} not found. Probe the claimed and missing ones.`;
+  else summary=`Weak match on paper. Only ${m.provenCount} of ${m.total} required skills show up in their code. ${m.gapCount} not found at all.`;
+  return `<section><div class="sh">Job-description match <span class="pill${a.hasLinkedin?'':' est'}">${a.hasLinkedin?'GitHub + LinkedIn':'GitHub only'}</span></div>
+    <div class="jdhead">${donut(m.matchPct)}<div class="jdsum">${summary}${!a.hasLinkedin?' <span style="color:var(--faint)">Paste LinkedIn text to also credit self-reported skills.</span>':''}</div></div>
+    <table class="matrix"><thead><tr><th>Skill required by JD</th><th>Required</th><th>GitHub<br>(proven)</th><th>LinkedIn<br>(claimed)</th><th>Verdict</th></tr></thead><tbody>${m.rows.map(rowHtml).join('')}</tbody></table>
+    ${bonusRows?`<div class="sh" style="margin:20px 0 10px">Extra skills they have (not in the JD)</div><table class="matrix"><tbody>${bonusRows}</tbody></table>`:''}
+    <div class="legend">Proven = found in their public code. Claimed = only in the LinkedIn text you pasted (self-reported, unverified). Gap = not found in either. Score weights proven 100%, claimed-only 50%.</div></section>`;
+}
 
-  const fit=[], flags=[];
-  if(a.stars>=100) fit.push(`Public projects have real traction — ${fmt(a.stars)} total stars, top repo ★${fmt(a.topStars)}. People chose to use their code.`);
-  else if(a.stars>0) fit.push(`Some external validation: ${a.stars} stars across owned repos. Modest but non-zero.`);
-  if(a.contrib && a.commits>=500) fit.push(`Heavy, verified output — ${fmt(a.commits)} commits in the last 12 months.`);
-  if(a.contrib && a.privateCount>0) fit.push(`${fmt(a.privateCount)} private contributions in the last year — a lot of their real work is behind closed repos, not missing.`);
-  if(a.daysSince<=30) fit.push(`Actively coding now — last contribution ${a.daysSince} day${a.daysSince===1?'':'s'} ago${a.streak?`, ${a.streak}-day streak`:''}.`);
-  if(a.lean==='Full-stack') fit.push('Ships both frontend and backend — good for end-to-end ownership.');
-  if(a.skills.length>=5) fit.push(`Demonstrated range: ${a.skills.slice(0,4).map(s=>s.name).join(', ')} across their repos.`);
-  if(a.originalPct>=70 && a.owned.length>=6) fit.push(`${a.originalPct}% of repos are original (not forks) — they build, not just clone.`);
-  if(!fit.length) fit.push('Little in the public record points to a clear strength on its own — the signal is weak, not necessarily the engineer.');
+/* ---------- AI explore ---------- */
+function buildAIPrompt(a){
+  const p=a.profile;
+  const trim=(s,n)=>{s=(s||'').replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n)+'…':s;};
+  let out=`You are a strict senior engineering interviewer helping evaluate a candidate. Be evidence-only, no flattery, and treat missing evidence as missing (not assumed).\n\n`;
+  out+=`CANDIDATE\n- Name: ${p.name||p.login}\n- GitHub: ${p.html_url} (${p.public_repos} repos, ${fmt(a.followers)} followers, since ${new Date(p.created_at).getFullYear()})\n`;
+  if(p.location)out+=`- Location: ${p.location}\n`;
+  if(p.company)out+=`- Company: ${p.company}\n`;
+  if(p.blog)out+=`- Site: ${p.blog}\n`;
+  if(p.twitter_username)out+=`- X: @${p.twitter_username}\n`;
+  out+=`\nAUTOMATED GITHUB SIGNAL\n- Top languages: ${a.langs.slice(0,6).map(l=>l.name+' '+l.pct+'%').join(', ')||'n/a'}\n- Frontend/Backend: ${a.fePct}/${a.bePct} (${a.lean})\n- Skills seen in code: ${[...a.ghProven].slice(0,14).join(', ')||'n/a'}\n- Stars: ${a.stars}; top repo ${a.topRepos[0]?a.topRepos[0].name+' (★'+a.topRepos[0].stargazers_count+')':'n/a'}\n- Commits: ${a.commits} (${a.commitBasis}); last active ${a.daysSince>365?Math.round(a.daysSince/30)+'mo':a.daysSince+'d'} ago${a.privateCount?`; ${a.privateCount} private contributions in last year`:''}\n- Automated GitHub score: ${a.score}/10 (${a.level})\n`;
+  out+=`- Notable repos: ${a.topRepos.map(r=>r.name+(r.description?' — '+trim(r.description,60):'')).join(' | ')||'n/a'}\n`;
+  if(a.hasJd){out+=`\nROLE (job description)\n${trim(a.jdText,1200)}\n`;if(a.jdMatch)out+=`Automated JD match: ${a.jdMatch.matchPct}% — proven: ${a.jdMatch.rows.filter(r=>r.verdict==='proven').map(r=>r.name).join(', ')||'none'}; claimed-only: ${a.jdMatch.claimedOnly.join(', ')||'none'}; gaps: ${a.jdMatch.gaps.join(', ')||'none'}\n`;}
+  if(a.hasLinkedin)out+=`\nLINKEDIN (self-reported, provided by recruiter): ${trim(a.linkedinText,500)}\n`;
+  out+=`\nTASKS\n1. Search the web for this person's public professional footprint — personal site, blog, conference talks, notable open-source work, papers, other developer profiles. Use primary sources. Explicitly flag anything uncertain or possibly a different person with the same name.\n2. Assess fit${a.hasJd?' for the role above':' for a senior software engineering role'}. Separate what is PROVEN (public code/work) from what is only CLAIMED (LinkedIn/self-report).\n3. Give: a score out of 10, a seniority read, key strengths, risks/gaps, and 4-6 specific questions to probe in an interview.\nBe explicit about what you could and could not verify.`;
+  return out;
+}
+function openAI(provider){
+  const prompt=window.__scoutPrompt||'';
+  const q=encodeURIComponent(prompt);
+  const url = provider==='claude' ? 'https://claude.ai/new?q='+q : 'https://chatgpt.com/?q='+q;
+  window.open(url,'_blank','noopener');
+}
+function copyPrompt(btn){
+  const t=window.__scoutPrompt||'';
+  navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1500);}).catch(()=>{});
+}
 
-  if(a.daysSince>365) flags.push(`Dormant: no ${a.contrib?'contributions':'public activity'} for ~${Math.round(a.daysSince/30)} months.`);
-  else if(a.daysSince>180) flags.push(`Low recent activity — last active ~${Math.round(a.daysSince/30)} months ago.`);
-  if(a.stars===0) flags.push('Zero stars on owned repos — no external validation of the public work.');
-  if(!a.contrib && !a.hasToken) flags.push('Basic mode: commit count is a rough estimate from recent events, and languages use each repo\u2019s primary language only. Add a token for exact numbers.');
-  if(a.emptyPct>=40) flags.push(`~${a.emptyPct}% of repos look like empty/placeholder projects — inflates repo count without depth.`);
-  if(a.originalPct<40 && repos.length>=6) flags.push(`Only ${a.originalPct}% original repos — the rest are forks.`);
-  if(a.owned.length<3) flags.push('Very few public repos — not enough to assess. Ask for private/work samples.');
+function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,social){
+  const a=analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd);
+  window.__scoutPrompt=buildAIPrompt(a);
+  const sc=a.score,col=scoreColor(sc);
+  const fit=[],flags=[];
+  if(a.stars>=100)fit.push(`Public projects have real traction — ${fmt(a.stars)} stars, top repo \u2605${fmt(a.topStars)}.`);
+  else if(a.stars>0)fit.push(`Some external validation: ${a.stars} stars across owned repos.`);
+  if(a.contrib&&a.commits>=500)fit.push(`Heavy verified output — ${fmt(a.commits)} commits in the last 12 months.`);
+  if(a.contrib&&a.privateCount>0)fit.push(`${fmt(a.privateCount)} private contributions last year — a lot of real work is in closed repos.`);
+  if(a.daysSince<=30)fit.push(`Actively coding — last contribution ${a.daysSince} day${a.daysSince===1?'':'s'} ago${a.streak?`, ${a.streak}-day streak`:''}.`);
+  if(a.lean==='Full-stack')fit.push('Ships both frontend and backend.');
+  if(a.skills.length>=5)fit.push(`Range: ${a.skills.slice(0,4).map(s=>s.name).join(', ')} across repos.`);
+  if(a.jdMatch&&a.jdMatch.matchPct>=75)fit.push(`Strong JD fit — ${a.jdMatch.matchPct}% matched, most proven in code.`);
+  if(!fit.length)fit.push('Little in the public record points to a clear strength — weak signal, not necessarily a weak engineer.');
+  if(a.jdMatch&&a.jdMatch.claimedOnly.length)flags.push(`Claimed but not proven: ${a.jdMatch.claimedOnly.join(', ')}. LinkedIn only — verify in interview.`);
+  if(a.jdMatch&&a.jdMatch.gaps.length)flags.push(`Not found anywhere: ${a.jdMatch.gaps.join(', ')}. Either missing or done in private work.`);
+  if(a.daysSince>365)flags.push(`Dormant: no ${a.contrib?'contributions':'public activity'} for ~${Math.round(a.daysSince/30)} months.`);
+  else if(a.daysSince>180)flags.push(`Low recent activity — last active ~${Math.round(a.daysSince/30)} months ago.`);
+  if(a.stars===0)flags.push('Zero stars on owned repos — no external validation of public work.');
+  if(!a.contrib&&!a.hasToken)flags.push('Basic mode: commits estimated, languages use primary-language only. Add a token for exact numbers.');
+  if(a.emptyPct>=40)flags.push(`~${a.emptyPct}% of repos look like empty/placeholder projects.`);
+  if(a.originalPct<40&&repos.length>=6)flags.push(`Only ${a.originalPct}% original repos — rest are forks.`);
+  if(a.owned.length<3)flags.push('Very few public repos — ask for private/work samples.');
 
-  const compRows = Object.keys(a.weights).map(k=>{const v=Math.round(a.comps[k]*10)/10;
-    return `<div class="bd"><div class="bk">${k} · ${Math.round(a.weights[k]*100)}%</div><div class="bv" style="color:${scoreColor(v)}">${v}<span style="font-size:11px;color:var(--faint)">/10</span></div></div>`;}).join('');
+  const compRows=Object.keys(a.weights).map(k=>{const v=Math.round(a.comps[k]*10)/10;return `<div class="bd"><div class="bk">${k} · ${Math.round(a.weights[k]*100)}%</div><div class="bv" style="color:${scoreColor(v)}">${v}<span style="font-size:11px;color:var(--faint)">/10</span></div></div>`;}).join('');
+  const langBars=a.langs.slice(0,7).map(l=>`<div class="bar"><div class="lab"><span>${l.name}</span><span class="p">${l.pct}%${a.deepLang?` · ${fmt(l.bytes)}B`:` · ${l.count} repo${l.count>1?'s':''}`}</span></div><div class="track"><div class="fill" style="width:${l.pct}%"></div></div></div>`).join('')||'<div class="status">No language data.</div>';
+  const skillBars=a.skills.map(s=>`<div class="bar"><div class="lab"><span>${s.name}</span><span class="p">${s.pct}% of repos</span></div><div class="track"><div class="fill" style="width:${s.pct}%;background:var(--amber)"></div></div></div>`).join('')||'<div class="status">No framework/tool signals detected.</div>';
+  const repoRows=a.topRepos.map(r=>`<div class="repo"><div><div class="rn">${r.name}</div><div class="rd">${r.description?r.description.slice(0,90):'\u2014 no description \u2014'}</div></div><div class="rs">\u2605 ${fmt(r.stargazers_count)}<br>${r.language||''}</div></div>`).join('')||'<div class="status">No repositories.</div>';
+  const contribSection=a.contrib?`<section><div class="sh">Contribution activity <span class="pill">GraphQL · verified</span></div><div class="grid" style="margin-bottom:16px"><div class="stat"><div class="k">Total contributions</div><div class="v">${fmt(a.totalContrib)}</div><div class="s">last 12 months</div></div><div class="stat"><div class="k">Commits</div><div class="v">${fmt(a.commits)}</div><div class="s">12 mo (public)</div></div><div class="stat"><div class="k">Private contributions</div><div class="v" style="color:${a.privateCount>0?'var(--amber)':'var(--muted)'}">${fmt(a.privateCount)}</div><div class="s">hidden work count</div></div><div class="stat"><div class="k">Current streak</div><div class="v">${a.streak}</div><div class="s">consecutive days</div></div></div>${heatmap(a.calendar)}</section>`:'';
+  const headlineFit=a.jdMatch?`<div class="vrow"><span class="vk">JD match</span><span class="vv" style="color:${pctColor(a.jdMatch.matchPct)}">${a.jdMatch.matchPct}% (${a.jdMatch.provenCount}/${a.jdMatch.total} proven)</span></div>`:'';
 
-  const langBars = a.langs.slice(0,7).map(l=>`
-    <div class="bar"><div class="lab"><span>${l.name}</span><span class="p">${l.pct}%${a.deepLang?` · ${fmt(l.bytes)}B`:` · ${l.count} repo${l.count>1?'s':''}`}</span></div>
-    <div class="track"><div class="fill" style="width:${l.pct}%"></div></div></div>`).join('') || '<div class="status">No language data.</div>';
+  const aibar=`<div class="aibar"><span class="lead">Explore deeper</span>
+    <button class="aibtn claude" onclick="openAI('claude')">Evaluate in Claude \u2197</button>
+    <button class="aibtn gpt" onclick="openAI('chatgpt')">Evaluate in ChatGPT \u2197</button>
+    <button class="aibtn" onclick="copyPrompt(this)">Copy prompt</button>
+    <div class="ainote">Opens a new tab with a ready prompt (GitHub data ${a.hasJd?'+ your JD ':''}included) asking the AI to research their public footprint and assess fit. If a tab opens without the text prefilled, use Copy prompt and paste it.</div></div>`;
 
-  const skillBars = a.skills.map(s=>`
-    <div class="bar"><div class="lab"><span>${s.name}</span><span class="p">${s.pct}% of repos</span></div>
-    <div class="track"><div class="fill" style="width:${s.pct}%;background:var(--amber)"></div></div></div>`).join('') || '<div class="status">No framework/tool signals detected.</div>';
-
-  const repoRows = a.topRepos.map(r=>`
-    <div class="repo"><div><div class="rn">${r.name}</div><div class="rd">${r.description?r.description.slice(0,90):'\u2014 no description \u2014'}</div></div>
-    <div class="rs">\u2605 ${fmt(r.stargazers_count)}<br>${r.language||''}</div></div>`).join('') || '<div class="status">No repositories.</div>';
-
-  const contribSection = a.contrib ? `
-    <section>
-      <div class="sh">Contribution activity <span class="pill">GraphQL · verified</span></div>
-      <div class="grid" style="margin-bottom:16px">
-        <div class="stat"><div class="k">Total contributions</div><div class="v">${fmt(a.totalContrib)}</div><div class="s">last 12 months</div></div>
-        <div class="stat"><div class="k">Commits</div><div class="v">${fmt(a.commits)}</div><div class="s">12 mo (public)</div></div>
-        <div class="stat"><div class="k">Private contributions</div><div class="v" style="color:${a.privateCount>0?'var(--amber)':'var(--muted)'}">${fmt(a.privateCount)}</div><div class="s">hidden work count</div></div>
-        <div class="stat"><div class="k">Current streak</div><div class="v">${a.streak}</div><div class="s">consecutive days</div></div>
-      </div>
-      ${heatmap(a.calendar)}
-    </section>` : '';
-
-  report.innerHTML = `
-    <div class="phead">
-      <img src="${profile.avatar_url}" alt="">
-      <div><div class="nm">${profile.name||profile.login}</div>
-      <div class="un">@${profile.login}${profile.location?' · '+profile.location:''}${profile.company?' · '+profile.company:''}</div>
-      ${profile.bio?`<div class="bio">${profile.bio}</div>`:''}</div>
-    </div>
-
+  report.innerHTML=`
+    <div class="phead"><img src="${profile.avatar_url}" alt=""><div><div class="nm">${profile.name||profile.login}</div><div class="un">@${profile.login}${profile.location?' · '+profile.location:''}${profile.company?' · '+profile.company:''}</div>${profile.bio?`<div class="bio">${profile.bio}</div>`:''}</div></div>
     <div class="grid">
       <div class="stat"><div class="k">Public repos</div><div class="v">${profile.public_repos}</div><div class="s">${a.owned.length} owned · ${a.forks.length} forks</div></div>
       <div class="stat"><div class="k">Stars received</div><div class="v">${fmt(a.stars)}</div><div class="s">top \u2605${fmt(a.topStars)}</div></div>
@@ -462,58 +463,33 @@ function render(profile, repos, events, contrib, byteLangs, hasToken){
       <div class="stat"><div class="k">Original repos</div><div class="v">${a.originalPct}%</div><div class="s">not forks</div></div>
       <div class="stat"><div class="k">PRs / Issues</div><div class="v">${fmt(a.prs)}/${fmt(a.issues)}</div><div class="s">${a.contrib?'12 mo':'recent'}</div></div>
     </div>
-
-    <div class="verdict">
-      <div class="vtop">
-        <div class="vscore"><div class="num" style="color:${col}">${sc}</div><div class="out">out of 10</div>
-          <div class="band" style="color:${col}">${sc>=7.5?'Strong signal':sc>=5?'Moderate':sc>=3?'Weak':'Thin / low'}</div></div>
-        <div class="vmeta">
-          <div class="vrow"><span class="vk">Level est.</span><span class="vv">${a.level}</span></div>
-          <div class="vrow"><span class="vk">Discipline</span><span class="vv">${a.lean}</span></div>
-          <div class="vrow"><span class="vk">Best fit</span><span class="vv">${bestFit(a)}</span></div>
-          <div class="vrow"><span class="vk">Data mode</span><span class="vv" style="color:${a.contrib?'var(--green)':'var(--yellow)'}">${a.contrib?'Deep (verified)':'Basic (estimated)'}</span></div>
-        </div>
-      </div>
-      <div class="vbody">
-        <h4>Score breakdown</h4><div class="breakdown">${compRows}</div>
-        <h4 style="margin-top:22px">Why they could be a fit</h4><ul>${fit.map(f=>`<li>${f}</li>`).join('')}</ul>
-        <h4>Read carefully / red flags</h4><ul>${(flags.length?flags:['Nothing obviously disqualifying in the public data.']).map(f=>`<li class="warn">${f}</li>`).join('')}</ul>
-        <h4>Where to place them</h4><ul><li>${placement(a)}</li><li style="color:var(--muted)">Level rationale: ${a.levelWhy}</li></ul>
-        <div class="caveat"><b>Honesty check:</b> ${a.contrib
-          ? 'Deep mode shows verified commit counts and even the number of private contributions — but a private count can\u2019t reveal what that hidden code actually is. This is still a screening signal to decide who to interview, never a final verdict.'
-          : 'GitHub shows only public work. Strong engineers who commit to private company repos score low here — a low number is weak evidence of weakness, not proof. Add a token for verified numbers. Always confirm real skill in a live technical loop.'}</div>
-      </div>
-    </div>
-
+    <div class="verdict"><div class="vtop">
+      <div class="vscore"><div class="num" style="color:${col}">${sc}</div><div class="out">GitHub score /10</div><div class="band" style="color:${col}">${sc>=7.5?'Strong signal':sc>=5?'Moderate':sc>=3?'Weak':'Thin / low'}</div></div>
+      <div class="vmeta">${headlineFit}<div class="vrow"><span class="vk">Level est.</span><span class="vv">${a.level}</span></div><div class="vrow"><span class="vk">Discipline</span><span class="vv">${a.lean}</span></div><div class="vrow"><span class="vk">Best fit</span><span class="vv">${bestFit(a)}</span></div><div class="vrow"><span class="vk">Data mode</span><span class="vv" style="color:${a.contrib?'var(--green)':'var(--yellow)'}">${a.contrib?'Deep (verified)':'Basic (estimated)'}</span></div></div>
+    </div><div class="vbody">
+      <h4>GitHub score breakdown</h4><div class="breakdown">${compRows}</div>
+      <h4 style="margin-top:22px">Why they could be a fit</h4><ul>${fit.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <h4>Read carefully / red flags</h4><ul>${(flags.length?flags:['Nothing obviously disqualifying in the public data.']).map(f=>`<li class="warn">${f}</li>`).join('')}</ul>
+      <h4>Where to place them</h4><ul><li>${placement(a)}</li><li style="color:var(--muted)">Level rationale: ${a.levelWhy}</li></ul>
+      <div class="caveat"><b>Honesty check:</b> ${a.hasJd?'JD match separates <i>proven in code</i> (GitHub) from merely <i>claimed</i> (LinkedIn). Claimed-only skills are interview questions, not facts; a gap can also mean private work.':(a.contrib?'Deep mode shows verified counts but can\u2019t reveal what private code is. Screening signal, never a verdict.':'GitHub shows only public work. Add a token for verified numbers; always confirm skill in a live loop.')}</div>
+    </div></div>
+    ${aibar}
+    ${contactSection(profile,social)}
+    ${jdSection(a)}
     ${contribSection}
-
-    <section>
-      <div class="sh">Frontend vs Backend <span class="pill${a.deepLang?'':' est'}">${a.deepLang?'byte-level · exact':'primary-language · estimate'}</span></div>
-      <div class="split"><div style="width:${a.fePct}%;background:var(--barfill)">${a.fePct>12?'FE '+a.fePct+'%':''}</div><div style="width:${a.bePct}%;background:var(--green)">${a.bePct>12?'BE '+a.bePct+'%':''}</div></div>
-      <div class="splitleg"><span>Frontend <b>${a.fePct}%</b></span><span>Backend <b>${a.bePct}%</b></span><span>Lean: <b>${a.lean}</b></span></div>
-    </section>
-
+    <section><div class="sh">Frontend vs Backend <span class="pill${a.deepLang?'':' est'}">${a.deepLang?'byte-level · exact':'primary-language · estimate'}</span></div><div class="split"><div style="width:${a.fePct}%;background:var(--barfill)">${a.fePct>12?'FE '+a.fePct+'%':''}</div><div style="width:${a.bePct}%;background:var(--green)">${a.bePct>12?'BE '+a.bePct+'%':''}</div></div><div class="splitleg"><span>Frontend <b>${a.fePct}%</b></span><span>Backend <b>${a.bePct}%</b></span><span>Lean: <b>${a.lean}</b></span></div></section>
     <section><div class="sh">Primary languages <span class="pill${a.deepLang?'':' est'}">${a.deepLang?'by bytes':'by repo count'}</span></div>${langBars}</section>
-    <section><div class="sh">Other skills detected (frameworks · tools · infra)</div>${skillBars}</section>
+    <section><div class="sh">Skills detected in code (frameworks · tools · infra)</div>${skillBars}</section>
     <section><div class="sh">Top repositories by stars</div>${repoRows}</section>
   `;
 }
-
-function bestFit(a){
-  if(a.lean.includes('Data'))return 'ML / data engineering';
-  if(a.lean.includes('Mobile'))return 'Mobile engineering';
-  if(a.lean==='Full-stack')return 'Full-stack / product engineering';
-  if(a.lean.includes('Frontend'))return 'Frontend / UI engineering';
-  if(a.lean.includes('Backend'))return 'Backend / platform engineering';
-  return 'Needs interview to place';
-}
-function placement(a){
-  const disc=bestFit(a), lvl=a.level.split(' signal')[0];
-  if(a.score>=7.5)return `Move to interview. Target: ${disc} at ${lvl.replace('/','or')} — the record backs a serious conversation.`;
-  if(a.score>=5)return `Worth a screen for ${disc}. Probe depth in interview; signal is decent but not conclusive.`;
-  if(a.score>=3)return `Borderline on GitHub alone. Advance only if the role is ${disc} and you can get work samples or a take-home.`;
-  return `Public data can\u2019t carry a decision. Likely early-career or a private-repo engineer — ask directly for work samples.`;
-}
+function bestFit(a){if(a.lean.includes('Data'))return'ML / data engineering';if(a.lean.includes('Mobile'))return'Mobile engineering';if(a.lean==='Full-stack')return'Full-stack / product engineering';if(a.lean.includes('Frontend'))return'Frontend / UI engineering';if(a.lean.includes('Backend'))return'Backend / platform engineering';return'Needs interview to place';}
+function placement(a){const disc=bestFit(a),lvl=a.level.split(' signal')[0];
+  if(a.jdMatch){const m=a.jdMatch;if(m.matchPct>=75)return `Strong fit for this role (${m.matchPct}% match, mostly proven). Move to interview; confirm ${m.claimedOnly.length?'claimed-only skills':'depth'} live.`;if(m.matchPct>=50)return `Partial fit (${m.matchPct}%). Worth a screen if the gaps (${m.gaps.slice(0,3).join(', ')||'none major'}) are learnable.`;return `Weak fit for this role (${m.matchPct}%). Core JD skills aren't evidenced. Advance only with a plan to test the gaps.`;}
+  if(a.score>=7.5)return `Move to interview. Target: ${disc} at ${lvl.replace('/','or')}.`;
+  if(a.score>=5)return `Worth a screen for ${disc}. Probe depth in interview.`;
+  if(a.score>=3)return `Borderline on GitHub alone. Advance only with work samples or a take-home.`;
+  return `Public data can\u2019t carry a decision. Likely early-career or a private-repo engineer.`;}
 </script>
 </body>
 </html>
