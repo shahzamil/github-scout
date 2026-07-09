@@ -568,10 +568,27 @@ function copyPrompt(btn){
   const t=window.__scoutPrompt||'';
   navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1500);}).catch(()=>{});
 }
+function buildFootprintPrompt(a){
+  const p=a.profile;
+  const known=[];
+  if(p.email)known.push('email '+p.email);
+  if(p.blog)known.push('site '+p.blog);
+  if(p.twitter_username)known.push('X @'+p.twitter_username);
+  if(p.company)known.push('company '+p.company);
+  if(p.location)known.push('location '+p.location);
+  let out=`Find the public professional footprint and contact details for this software engineer, for recruiting outreach. Use publicly available professional sources only.\n\n`;
+  out+=`PERSON\n- Name: ${p.name||p.login}\n- GitHub: ${p.html_url}\n- Username: ${p.login}\n`;
+  if(known.length)out+=`- Already known from GitHub: ${known.join('; ')}\n`;
+  out+=`- To disambiguate them: top repos ${a.topRepos.slice(0,3).map(r=>r.name).join(', ')||'n/a'}; main languages ${a.langs.slice(0,3).map(l=>l.name).join(', ')||'n/a'}${p.location?'; based in '+p.location:''}\n`;
+  out+=`\nFIND\n1. Their LinkedIn profile — give the URL and say why you believe it's the same person.\n2. A contact / business email. If you have an Apollo.io connector (or any people-enrichment tool) available, use it to find or verify a business email; otherwise report only what is publicly listed.\n3. Other professional presence: personal site, blog, X/Twitter, dev.to, Stack Overflow, conference talks, employer page.\n\nRULES\n- Public professional information only — no private data.\n- This name may match several people. State clearly how confident you are that each result is the same person, and flag uncertainty.\n- Don't guess. If you can't verify something, say so. List each finding with its source link.`;
+  return out;
+}
+function openFootprint(){const q=encodeURIComponent(window.__scoutFootprint||'');window.open('https://claude.ai/new?q='+q,'_blank','noopener');}
 
 function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,social,collab){
   const a=analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,collab);
   window.__scoutPrompt=buildAIPrompt(a);
+  window.__scoutFootprint=buildFootprintPrompt(a);
   window.__scoutA=a;
   const sc=a.score,col=scoreColor(sc);
   const fit=[],flags=[];
@@ -632,8 +649,9 @@ function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,soci
   const aibar=`<div class="aibar"><span class="lead">Explore deeper</span>
     <button class="aibtn claude" onclick="openAI('claude')">Evaluate in Claude \u2197</button>
     <button class="aibtn gpt" onclick="openAI('chatgpt')">Evaluate in ChatGPT \u2197</button>
+    <button class="aibtn claude" onclick="openFootprint()">Find footprint \u2197</button>
     <button class="aibtn" onclick="copyPrompt(this)">Copy prompt</button>
-    <div class="ainote">Opens a new tab with a ready prompt (GitHub data ${a.hasJd?'+ your JD ':''}included) asking the AI to research their public footprint and assess fit. If a tab opens without the text prefilled, use Copy prompt and paste it.</div></div>`;
+    <div class="ainote">Opens Claude/ChatGPT in a new tab with a ready prompt (GitHub data ${a.hasJd?'+ your JD ':''}included). "Evaluate" assesses fit; "Find footprint" hunts their LinkedIn, email and socials — and will use your Apollo connector to find a business email if you've linked Apollo to Claude. If a tab opens without the text prefilled, use Copy prompt.</div></div>`;
 
   report.innerHTML=`
     <div class="reportactions">
