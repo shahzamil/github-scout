@@ -145,6 +145,13 @@
   .bd .bk{font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
   .bd .bv{font-family:var(--disp);font-weight:700;font-size:17px;margin-top:3px}
   .caveat{background:var(--amber-dim);border-radius:8px;padding:12px 14px;font-size:12.5px;color:#f0d9ad;margin-top:14px;line-height:1.6}
+  .finaldec{background:linear-gradient(160deg,#12181f,#0f1319);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:14px;padding:20px 22px;margin-bottom:16px}
+  .finaldec .fdlabel{font-family:var(--disp);font-weight:700;font-size:23px;letter-spacing:-.01em;margin:2px 0 12px}
+  .finaldec .fdtags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+  .finaldec .fdtags span{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:3px 10px}
+  .finaldec .fdtext{font-size:14px;line-height:1.65;margin:0 0 14px}
+  .finaldec .fdrec{font-size:13.5px;color:var(--amber);border-top:1px solid var(--border);padding-top:12px}
+  .finaldec .fdconf{font-family:var(--mono);font-size:11px;margin-top:8px;line-height:1.5}
 
   .aibar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:16px}
   .aibar .lead{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.12em;text-transform:uppercase;margin-right:6px}
@@ -591,6 +598,7 @@ function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,soci
   window.__scoutPrompt=buildAIPrompt(a);
   window.__scoutFootprint=buildFootprintPrompt(a);
   window.__scoutA=a;
+  const cls=classifyEngineer(a);
   const sc=a.score,col=scoreColor(sc);
   const fit=[],flags=[];
   if(a.stars>=100)fit.push(`Public projects have real traction — ${fmt(a.stars)} stars, top repo \u2605${fmt(a.topStars)}.`);
@@ -620,6 +628,7 @@ function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,soci
   window.__scoutSummary=[
     `GitHub Scout — ${profile.name||profile.login} (@${profile.login})`,
     `Score ${a.score}/10${a.jdMatch?` · JD match ${a.jdMatch.matchPct}%`:''} · ${a.level} · ${a.lean}`,
+    `Type: ${cls.label} (${cls.conf} confidence)`,
     profile.html_url,
     ``,
     `Languages: ${a.langs.slice(0,5).map(l=>l.name+' '+l.pct+'%').join(', ')||'n/a'}`,
@@ -681,6 +690,7 @@ function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,soci
       <h4>Where to place them</h4><ul><li>${placement(a)}</li><li style="color:var(--muted)">Level rationale: ${a.levelWhy}</li></ul>
       <div class="caveat"><b>Honesty check:</b> ${a.hasJd?'JD match separates <i>proven in code</i> (GitHub) from merely <i>claimed</i> (LinkedIn). Claimed-only skills are interview questions, not facts; a gap can also mean private work.':(a.contrib?'Deep mode shows verified counts but can\u2019t reveal what private code is. Screening signal, never a verdict.':'GitHub shows only public work. Add a token for verified numbers; always confirm skill in a live loop.')}</div>
     </div></div>
+    ${finalDecisionSection(a,cls)}
     ${aibar}
     ${outreachSection(a)}
     ${contactSection(profile,social)}
@@ -692,6 +702,60 @@ function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,soci
     <section><div class="sh">Skills detected in code (frameworks · tools · infra)</div>${skillBars}</section>
     <section><div class="sh">Top repositories by stars</div>${repoRows}</section>
   `;
+}
+function classifyEngineer(a){
+  const lang=a.langs[0]?a.langs[0].name:null;
+  const langPct=a.langs[0]?a.langs[0].pct:0;
+  const lean=a.lean;
+  const strongDominant=langPct>=75;
+  const devops=['Docker','Kubernetes','Terraform / IaC'].filter(n=>a.ghProven.has(n)).length;
+  let kind='',stack='';
+  if(lean.includes('Data')){kind='ML / Data Engineer';stack=lang||'Python';}
+  else if(lean.includes('Mobile')){const ml=a.langs.find(l=>['Swift','Kotlin','Dart','Objective-C'].includes(l.name));kind='Mobile Engineer';stack=a.ghProven.has('Mobile')&&!ml?'Flutter / RN':(ml?ml.name:'Mobile');}
+  else if(lean==='Full-stack'){kind='Full-stack Engineer';const fw=['React','Vue / Nuxt','Angular','Svelte'].find(n=>a.ghProven.has(n));const beLang=(a.langs.find(l=>BE.has(l.name))||{}).name;const feName=fw?fw.split(' ')[0]:(a.langs.find(l=>['TypeScript','JavaScript'].includes(l.name))?'JS':'');const beName=beLang||(a.ghProven.has('Node.js')?'Node':'');stack=[feName,beName].filter(Boolean).join(' / ')||(lang||'');}
+  else if(lean.includes('Backend')){let beLang=(a.langs.find(l=>BE.has(l.name))||{}).name||lang;if(a.ghProven.has('Node.js')&&['JavaScript','TypeScript'].includes(beLang))stack='Node.js';else stack=beLang||'';kind=strongDominant?'Core Backend Engineer':'Backend Engineer';if(devops>=2)kind=strongDominant?'Core Backend / Platform Engineer':'Backend / Platform Engineer';}
+  else if(lean.includes('Frontend')){const fw=['React','Vue / Nuxt','Angular','Svelte'].find(n=>a.ghProven.has(n));stack=fw?fw.split(' ')[0]:(lang||'JS/TS');kind=strongDominant?'Core Frontend Engineer':'Frontend Engineer';}
+  else {kind='Generalist / Unclear';stack=lang||'';}
+  const label=stack?`${kind} — ${stack}`:kind;
+  let conf='Medium';const reasons=[];
+  reasons.push(a.owned.length+' public repos');
+  if(a.deepLang)reasons.push('byte-level languages');
+  if(a.contrib)reasons.push('verified contributions');
+  if(a.owned.length<4||lean.includes('Unclear'))conf='Low';
+  else if((strongDominant||lean==='Full-stack')&&a.owned.length>=8&&(a.deepLang||a.contrib))conf='High';
+  const tags=[];
+  if(lean&&!lean.includes('Unclear'))tags.push(lean.replace(' leaning',''));
+  if(lang)tags.push(lang+' '+langPct+'%');
+  if(a.daysSince<=60)tags.push('Actively shipping');else if(a.daysSince>365)tags.push('Dormant');
+  if(a.collab&&a.collab.notable&&a.collab.notable.some(n=>n.stars>=200))tags.push('OSS contributor');
+  if(devops>=2)tags.push('DevOps-capable');
+  if(a.stars>=100)tags.push('High-traction');
+  tags.push(a.level.split(' signal')[0]);
+  return {label,kind,stack,conf,reasons,tags};
+}
+function finalComments(a,cls){
+  let s0=`A ${cls.kind.toLowerCase()}`;
+  if(cls.stack)s0+=` working mainly in ${cls.stack}`;
+  if(a.langs[0])s0+=` (${a.langs[0].pct}% of their public code)`;
+  s0+='.';
+  const bits=[s0];
+  if(a.contrib)bits.push(a.commits>=300?`Actively shipping, ${fmt(a.commits)} commits in the last year.`:`Lighter recent output (${fmt(a.commits)} commits in the last year).`);
+  else bits.push(a.daysSince<=60?'Recently active on GitHub.':a.daysSince>365?`Public activity has been quiet for ~${Math.round(a.daysSince/30)} months.`:'Moderately active recently.');
+  if(a.collab&&a.collab.mergedPRs>=10)bits.push(`Comfortable in others' codebases \u2014 ${a.collab.mergedPRs} merged PRs across ${a.collab.distinctExternal} external repos.`);
+  else if(a.collabMeasured&&a.collab.externalPRs===0)bits.push('Works mostly solo in public; little cross-repo collaboration is visible.');
+  if(a.stars>=100)bits.push(`Their public work has real traction (${fmt(a.stars)} stars).`);
+  if(a.learnPct>=40)bits.push('A chunk of the repos look like tutorial/practice projects, so weigh the substantive ones.');
+  return bits.join(' ');
+}
+function finalDecisionSection(a,cls){
+  const confColor=cls.conf==='High'?'var(--green)':cls.conf==='Low'?'var(--orange)':'var(--yellow)';
+  return `<section class="finaldec"><div class="sh">Final decision</div>
+    <div class="fdlabel">${cls.label}</div>
+    <div class="fdtags">${cls.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+    <p class="fdtext">${finalComments(a,cls)}</p>
+    <div class="fdrec">Recommendation: ${placement(a)}</div>
+    <div class="fdconf" style="color:${confColor}">Confidence: ${cls.conf}${cls.reasons.length?' — based on '+cls.reasons.join(', '):''}. Public GitHub only — confirm in a live technical loop.</div>
+  </section>`;
 }
 function bestFit(a){if(a.lean.includes('Data'))return'ML / data engineering';if(a.lean.includes('Mobile'))return'Mobile engineering';if(a.lean==='Full-stack')return'Full-stack / product engineering';if(a.lean.includes('Frontend'))return'Frontend / UI engineering';if(a.lean.includes('Backend'))return'Backend / platform engineering';return'Needs interview to place';}
 function placement(a){const disc=bestFit(a),lvl=a.level.split(' signal')[0];
