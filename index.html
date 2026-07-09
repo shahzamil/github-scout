@@ -285,10 +285,11 @@
         <input id="fLoc" placeholder="location e.g. Jakarta">
         <input id="fFollowers" placeholder="min followers e.g. 50" inputmode="numeric">
         <input id="fRepos" placeholder="min public repos e.g. 10" inputmode="numeric">
+        <input id="fMinPct" placeholder="min % of repos in that language e.g. 50" inputmode="numeric">
         <input id="fKeyword" placeholder="keyword in profile (optional)">
       </div>
       <button class="btn" id="runSearch">Search GitHub</button>
-      <div class="findnote">GitHub Search finds users by their <b>public</b> footprint. It won't surface strong engineers who work only in private repos — it's a lead generator, not a full census. Search allows ~10 requests/min without a token, 30/min with one.</div>
+      <div class="findnote">When you set a <b>language</b>, the tool checks each result's repos and keeps only those where that language is a real share of their work (default \u226540%), ranked by depth — so a 2%-Go dabbler drops below a 90%-Go engineer. This fetches each candidate's repos, so <b>use a token</b>. Public footprint only.</div>
     </div>
 
     <div id="contribPanel" class="hidden">
@@ -881,21 +882,41 @@ function findErr(e){const s=fstat();s.className='status err';
     : e.code===404 ? 'Not found — check the repo/org name.'
     : 'Something went wrong ('+(e.code||'network')+'). Try again.';}
 
+function canonLang(input){const t=(input||'').trim().toLowerCase();for(const[name,aliases]of Object.entries(LANGS)){if(name.toLowerCase()===t||aliases.includes(t))return name;}return (input||'').trim();}
 async function runSearch(){
   const token=$('token').value.trim();
   const parts=['type:user'];
   const kw=$('fKeyword').value.trim(); if(kw)parts.unshift(kw);
-  const lang=$('fLang').value.trim(); if(lang)parts.push('language:'+lang);
+  const langRaw=$('fLang').value.trim(); const lang=canonLang(langRaw); if(langRaw)parts.push('language:'+lang);
   const loc=$('fLoc').value.trim(); if(loc)parts.push('location:'+(/\s/.test(loc)?'"'+loc+'"':loc));
   const fol=parseInt($('fFollowers').value,10); if(fol>0)parts.push('followers:>='+fol);
   const rep=parseInt($('fRepos').value,10); if(rep>0)parts.push('repos:>='+rep);
+  const minRaw=parseInt($('fMinPct').value,10); const min=isNaN(minRaw)?40:minRaw;
   if(parts.length===1){fstat().className='status err';fstat().textContent='Add at least one filter (language, location, followers…).';return;}
   const q=parts.join(' ');const s=fstat();s.className='status';s.textContent='Searching GitHub…';$('findResults').innerHTML='';
   try{
     const d=await gh('/search/users?q='+encodeURIComponent(q)+'&per_page=30&sort=followers&order=desc',token);
     const items=d.items||[];
-    s.textContent=fmt(d.total_count||0)+' users match — showing top '+items.length+', by followers.';
-    renderResults(items.map(u=>({login:u.login,avatar:u.avatar_url,url:u.html_url,sub:'GitHub user'})));
+    if(!langRaw){
+      s.textContent=fmt(d.total_count||0)+' users match — showing top '+items.length+', by followers.';
+      renderResults(items.map(u=>({login:u.login,avatar:u.avatar_url,url:u.html_url,sub:'GitHub user'})));
+      return;
+    }
+    // language-depth pass
+    const enriched=[]; let hitLimit=false;
+    for(let i=0;i<items.length;i++){
+      s.textContent=`Measuring ${lang} depth… ${i+1}/${items.length}`;
+      try{
+        const repos=await gh('/users/'+items[i].login+'/repos?per_page=100&sort=pushed',token);
+        const owned=repos.filter(r=>!r.fork&&r.language);
+        const total=owned.length;
+        const match=owned.filter(r=>r.language.toLowerCase()===lang.toLowerCase()).length;
+        enriched.push({login:items[i].login,avatar:items[i].avatar_url,url:items[i].html_url,pctv:total?Math.round(match/total*100):0,match,total});
+      }catch(e){if(e.code===403){hitLimit=true;break;}}
+    }
+    const filtered=enriched.filter(x=>x.pctv>=min).sort((a,b)=>b.pctv-a.pctv);
+    s.textContent=`${filtered.length} of ${enriched.length} checked have \u2265${min}% of their public repos in ${lang}${hitLimit?' — stopped early (rate limit; add a token)':''}.`;
+    renderResults(filtered.map(x=>({login:x.login,avatar:x.avatar,url:x.url,badge:`${lang} ${x.pctv}%`,sub:`${x.match}/${x.total} public repos in ${lang}`})));
   }catch(e){findErr(e);}
 }
 
@@ -938,7 +959,7 @@ function renderResults(list){
   const el=$('findResults');
   if(!list.length){el.innerHTML='<div class="status">No results.</div>';return;}
   el.innerHTML=list.map(r=>`<div class="res"><img src="${r.avatar}" alt="">
-    <div class="info"><b>@${r.login}</b>${r.contributions?`<span class="contribbadge">\u2605 ${fmt(r.contributions)}</span>`:''}<div class="sub">${r.sub||''}</div></div>
+    <div class="info"><b>@${r.login}</b>${r.badge?`<span class="contribbadge">${r.badge}</span>`:(r.contributions?`<span class="contribbadge">\u2605 ${fmt(r.contributions)}</span>`:'')}<div class="sub">${r.sub||''}</div></div>
     <div class="acts"><button class="mini eval" data-eval="${r.login}">Evaluate</button><button class="mini" data-gh="${r.url}">GitHub \u2197</button></div></div>`).join('');
   el.querySelectorAll('[data-eval]').forEach(b=>b.onclick=()=>evaluateFrom(b.dataset.eval));
   el.querySelectorAll('[data-gh]').forEach(b=>b.onclick=()=>window.open(b.dataset.gh,'_blank','noopener'));
