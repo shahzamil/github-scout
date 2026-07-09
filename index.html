@@ -592,6 +592,43 @@ function buildFootprintPrompt(a){
   return out;
 }
 function openFootprint(){const q=encodeURIComponent(window.__scoutFootprint||'');window.open('https://claude.ai/new?q='+q,'_blank','noopener');}
+function findSimilarStack(){
+  const a=window.__scoutA; if(!a)return;
+  showTab('find'); showSeg('search');
+  $('fLang').value=a.langs[0]?a.langs[0].name:'';
+  $('fLoc').value=a.profile.location||'';
+  $('fFollowers').value='';$('fRepos').value='';$('fMinPct').value='';$('fKeyword').value='';
+  window.scrollTo({top:0,behavior:'smooth'});
+  runSearch();
+}
+async function findOrbit(){
+  const a=window.__scoutA; if(!a)return;
+  const token=$('token').value.trim();
+  showTab('find');
+  const s=$('findStatus'); s.className='status'; $('findResults').innerHTML='';
+  window.scrollTo({top:0,behavior:'smooth'});
+  const cand=a.profile.login.toLowerCase();
+  const repos=[];
+  if(a.collab&&a.collab.notable)a.collab.notable.forEach(n=>repos.push(n.full));
+  a.topRepos.slice(0,5).forEach(r=>repos.push(a.profile.login+'/'+r.name));
+  const uniq=[...new Set(repos)].slice(0,8);
+  if(!uniq.length){s.className='status err';s.textContent='Not enough repo data to map this candidate\u2019s orbit.';return;}
+  const agg={}; let hitLimit=false;
+  for(let i=0;i<uniq.length;i++){
+    s.textContent=`Mapping @${a.profile.login}'s orbit… repo ${i+1}/${uniq.length}`;
+    let cs; try{cs=await gh('/repos/'+uniq[i]+'/contributors?per_page=100',token);}catch(e){if(e&&e.code===403){hitLimit=true;break;}continue;}
+    (cs||[]).forEach(c=>{
+      if(!c||!c.login)return;
+      if(c.login.toLowerCase()===cand)return;
+      if(c.type==='Bot'||/\[bot\]$/i.test(c.login))return;
+      if(!agg[c.login])agg[c.login]={login:c.login,avatar:c.avatar_url,url:c.html_url,shared:0,contributions:0};
+      agg[c.login].shared+=1; agg[c.login].contributions+=c.contributions||0;
+    });
+  }
+  const list=Object.values(agg).sort((x,y)=>y.shared-x.shared||y.contributions-x.contributions).slice(0,50);
+  s.textContent=`${list.length} people share repos with @${a.profile.login}${hitLimit?' — stopped early (rate limit; add a token)':''}, ranked by shared projects.`;
+  renderResults(list.map(x=>({login:x.login,avatar:x.avatar,url:x.url,badge:x.shared+' shared',sub:`${x.shared} shared repo${x.shared>1?'s':''} · ${fmt(x.contributions)} commits there`})));
+}
 
 function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,social,collab){
   const a=analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,collab);
@@ -662,6 +699,10 @@ function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,soci
     <button class="aibtn claude" onclick="openFootprint()">Find footprint \u2197</button>
     <button class="aibtn" onclick="copyPrompt(this)">Copy prompt</button>
     <div class="ainote">Opens Claude/ChatGPT in a new tab with a ready prompt (GitHub data ${a.hasJd?'+ your JD ':''}included). "Evaluate" assesses fit; "Find footprint" hunts their LinkedIn, email and socials — and will use your Apollo connector to find a business email if you've linked Apollo to Claude. If a tab opens without the text prefilled, use Copy prompt.</div></div>`;
+  const simbar=`<div class="aibar"><span class="lead">Find similar</span>
+    <button class="aibtn" onclick="findSimilarStack()">By stack + location \u2197</button>
+    <button class="aibtn" onclick="findOrbit()">Same orbit (co-contributors) \u2197</button>
+    <div class="ainote">"By stack" finds more engineers in the same language/location lane (uses the search + depth filter). "Same orbit" finds people who contribute to the same repos as this candidate — a token is recommended (more API calls). Note: similar = similar public footprint, not similar seniority.</div></div>`;
 
   report.innerHTML=`
     <div class="reportactions">
@@ -692,6 +733,7 @@ function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,soci
     </div></div>
     ${finalDecisionSection(a,cls)}
     ${aibar}
+    ${simbar}
     ${outreachSection(a)}
     ${contactSection(profile,social)}
     ${jdSection(a)}
