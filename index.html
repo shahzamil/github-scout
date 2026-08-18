@@ -9,14 +9,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0e1014; --panel:#161a21; --panel2:#1c212b; --border:#272d38;
-    --text:#e7e9ee; --muted:#8b93a2; --faint:#5c6472;
-    --amber:#ffb454; --amber-dim:#3a2f1a;
-    --red:#f2555a; --orange:#ff8a4c; --yellow:#f5c451; --green:#4bd08b;
-    --barfill:#6f8cff; --claim:#c58af9; --blue:#5b9dff;
+    --bg:#f6f7f9; --panel:#ffffff; --panel2:#f1f5f9; --border:#e6e8ec;
+    --text:#0f172a; --muted:#64748b; --faint:#94a3b8;
+    --amber:#4f46e5; --amber-dim:#eef2ff;
+    --red:#dc2626; --orange:#ea580c; --yellow:#d97706; --green:#16a34a;
+    --barfill:#6366f1; --claim:#9333ea; --blue:#2563eb;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
     --disp:'Space Grotesk',system-ui,sans-serif;
     --body:'Inter',system-ui,sans-serif;
+    --shadow:0 1px 2px rgba(15,23,42,.04),0 1px 3px rgba(15,23,42,.06);
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);
@@ -30,14 +31,14 @@
   .brand .tag{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
   .brand .amber{color:var(--amber)}
   .mode{font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);color:var(--faint);white-space:nowrap}
-  .mode.deep{color:var(--green);border-color:#1e3b2b;background:#12261b}
-  .mode.basic{color:var(--yellow);border-color:#3a3418;background:#221f10}
+  .mode.deep{color:var(--green);border-color:#a7f3d0;background:#ecfdf5}
+  .mode.basic{color:#b45309;border-color:#fde68a;background:#fffbeb}
 
   .search{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
   .field{flex:1;min-width:220px;display:flex;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:0 12px}
   .field span{font-family:var(--mono);color:var(--faint);font-size:14px}
   .field input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:var(--mono);font-size:15px;padding:13px 6px}
-  .btn{background:var(--amber);color:#1a1206;border:none;border-radius:10px;padding:13px 22px;font-family:var(--disp);font-weight:700;font-size:14px;cursor:pointer}
+  .btn{background:var(--amber);color:#fff;border:none;border-radius:10px;padding:13px 22px;font-family:var(--disp);font-weight:700;font-size:14px;cursor:pointer}
   .btn:hover{filter:brightness(1.06)}
   .btn:disabled{opacity:.5;cursor:default}
   .tokrow{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
@@ -70,15 +71,15 @@
   .phead .bio{color:var(--muted);font-size:13px;margin-top:3px;max-width:520px}
 
   .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-  .stat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
   .stat .k{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase}
   .stat .v{font-family:var(--disp);font-weight:700;font-size:24px;margin-top:6px}
   .stat .s{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
 
-  section{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
+  section{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
   .sh{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.16em;text-transform:uppercase;margin-bottom:16px}
-  .sh .pill{color:var(--green);border:1px solid #1e3b2b;padding:2px 7px;border-radius:12px;margin-left:8px;letter-spacing:.05em}
-  .sh .pill.est{color:var(--yellow);border-color:#3a3418}
+  .sh .pill{color:var(--green);border:1px solid #a7f3d0;padding:2px 7px;border-radius:12px;margin-left:8px;letter-spacing:.05em}
+  .sh .pill.est{color:#b45309;border-color:#fde68a}
 
   .contact{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
   .cc{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:11px 13px}
@@ -93,7 +94,7 @@
   .fill{height:100%;border-radius:6px;background:var(--barfill);transition:width .6s ease}
 
   .split{display:flex;height:34px;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:12px}
-  .split div{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:500;color:#0e1014}
+  .split div{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:600;color:#fff}
   .splitleg{display:flex;gap:18px;font-family:var(--mono);font-size:11px;color:var(--muted);flex-wrap:wrap}
   .splitleg b{color:var(--text)}
 
@@ -121,11 +122,11 @@
   .dot{display:inline-block;width:16px;height:16px;line-height:16px;border-radius:50%;font-size:11px;font-family:var(--mono)}
   .yes{color:var(--green)} .no{color:var(--faint)} .claimdot{color:var(--claim)}
   .vtag{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:12px}
-  .vtag.proven{color:var(--green);background:#12261b} .vtag.claimed{color:var(--claim);background:#241833}
-  .vtag.gap{color:var(--red);background:#2a1517} .vtag.bonus{color:var(--muted);background:var(--panel2)}
+  .vtag.proven{color:var(--green);background:#ecfdf5} .vtag.claimed{color:var(--claim);background:#f3e8ff}
+  .vtag.gap{color:var(--red);background:#fef2f2} .vtag.bonus{color:var(--muted);background:var(--panel2)}
   .legend{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:12px;line-height:1.7}
 
-  .verdict{background:linear-gradient(160deg,#1a1e27,#12151b);border:1px solid var(--amber-dim);border-radius:16px;overflow:hidden;margin-bottom:16px}
+  .verdict{background:linear-gradient(160deg,#ffffff,#f5f6ff);border:1px solid #e0e2f5;border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow)}
   .vtop{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--border)}
   .vscore{padding:26px 30px;text-align:center;border-right:1px solid var(--border);min-width:160px}
   .vscore .num{font-family:var(--disp);font-weight:700;font-size:56px;line-height:1}
@@ -139,13 +140,13 @@
   .vbody h4{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase;margin:0 0 10px}
   .vbody ul{margin:0 0 18px;padding-left:18px}
   .vbody li{font-size:14px;margin-bottom:7px}
-  .vbody li.warn{color:var(--yellow)}
+  .vbody li.warn{color:#b45309}
   .breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:6px}
   .bd{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
   .bd .bk{font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
   .bd .bv{font-family:var(--disp);font-weight:700;font-size:17px;margin-top:3px}
-  .caveat{background:var(--amber-dim);border-radius:8px;padding:12px 14px;font-size:12.5px;color:#f0d9ad;margin-top:14px;line-height:1.6}
-  .finaldec{background:linear-gradient(160deg,#12181f,#0f1319);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:14px;padding:20px 22px;margin-bottom:16px}
+  .caveat{background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;font-size:12.5px;color:#9a3412;margin-top:14px;line-height:1.6}
+  .finaldec{background:linear-gradient(160deg,#ffffff,#f7f8fc);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:14px;padding:20px 22px;margin-bottom:16px;box-shadow:var(--shadow)}
   .finaldec .fdlabel{font-family:var(--disp);font-weight:700;font-size:23px;letter-spacing:-.01em;margin:2px 0 12px}
   .finaldec .fdtags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
   .finaldec .fdtags span{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:3px 10px}
@@ -153,12 +154,12 @@
   .finaldec .fdrec{font-size:13.5px;color:var(--amber);border-top:1px solid var(--border);padding-top:12px}
   .finaldec .fdconf{font-family:var(--mono);font-size:11px;margin-top:8px;line-height:1.5}
 
-  .aibar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:16px}
+  .aibar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:16px;box-shadow:var(--shadow)}
   .aibar .lead{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.12em;text-transform:uppercase;margin-right:6px}
   .aibtn{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:9px;padding:10px 16px;font-family:var(--disp);font-weight:500;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
   .aibtn:hover{border-color:var(--amber)}
-  .aibtn.claude{background:#2a1a10;border-color:#4a2f18;color:#ffb454}
-  .aibtn.gpt{background:#0f2018;border-color:#1e3b2b;color:#7fe0aa}
+  .aibtn.claude{background:#eef2ff;border-color:#c7d2fe;color:#4f46e5}
+  .aibtn.gpt{background:#ecfdf5;border-color:#a7f3d0;color:#047857}
   .ainote{font-family:var(--mono);font-size:10px;color:var(--faint);width:100%;margin-top:2px}
   .outreach .ctx{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
   .outreach .ctx input{background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px;outline:none}
@@ -176,11 +177,11 @@
   .reportactions{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
   .reportactions .ra{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;font-family:var(--body)}
   .reportactions .ra:hover{border-color:var(--amber)}
-  .reportactions .ra.primary{background:#2a1a10;border-color:#4a2f18;color:var(--amber);font-weight:600}
+  .reportactions .ra.primary{background:#eef2ff;border-color:#c7d2fe;color:var(--amber);font-weight:600}
   .shortbar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
   .shortbar button{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;font-family:var(--body)}
   .shortbar button:hover{border-color:var(--amber)}
-  .strow{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;flex-wrap:wrap}
+  .strow{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;flex-wrap:wrap;box-shadow:var(--shadow)}
   .strow .sc{font-family:var(--mono);font-weight:700;font-size:15px;width:34px;text-align:center;flex-shrink:0}
   .strow .who{flex:1;min-width:150px}
   .strow .who b{font-size:13px}.strow .who .u{font-family:var(--mono);font-size:11px;color:var(--muted)}
@@ -191,11 +192,10 @@
   .strow .mini:hover{border-color:var(--amber)}
   .empty{color:var(--faint);text-align:center;padding:26px;font-family:var(--mono);font-size:12px}
   @media print{
-    :root{--bg:#fff;--panel:#fff;--panel2:#f3f4f6;--border:#cfd4dc;--text:#111;--muted:#444;--faint:#666;--amber-dim:#f5e6c8}
+    :root{--bg:#fff;--panel:#fff;--panel2:#f3f4f6;--border:#cfd4dc;--text:#111;--muted:#444;--faint:#666}
     body{background:#fff}
     .top,.tabs,.tokrow,#evalView>.search,details.role,.hint,#status,.reportactions,.aibar,.outreach,#findView,#shortView{display:none!important}
-    section,.verdict{break-inside:avoid;border-color:#cfd4dc}
-    .caveat{color:#6a5320}
+    section,.verdict,.stat,.finaldec,.strow{box-shadow:none;break-inside:avoid;border-color:#cfd4dc}
   }
 
   .tabs{display:flex;gap:8px;margin-bottom:16px}
@@ -208,7 +208,7 @@
   .findgrid.two{grid-template-columns:1fr 1fr}
   .findgrid input{background:var(--panel);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:10px;outline:none}
   .findgrid input:focus{border-color:var(--amber)}
-  .res{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+  .res{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow)}
   .res img{width:38px;height:38px;border-radius:8px;border:1px solid var(--border)}
   .res .info{flex:1;min-width:0}
   .res .info b{font-size:14px}
@@ -216,7 +216,7 @@
   .res .acts{display:flex;gap:6px;flex-shrink:0}
   .res .mini{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 11px;font-size:12px;cursor:pointer;font-family:var(--body)}
   .res .mini:hover{border-color:var(--amber)}
-  .res .mini.eval{color:var(--amber);border-color:#4a2f18}
+  .res .mini.eval{color:var(--amber);border-color:#c7d2fe}
   .contribbadge{font-family:var(--mono);font-size:11px;color:var(--amber);margin-left:6px}
   .findnote{font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.6;margin:6px 0 10px}
   @media(max-width:640px){.findgrid{grid-template-columns:1fr 1fr}}
@@ -370,7 +370,12 @@ const SKILLS={
   'Docker':['docker','dockerfile','container','containers'],'Kubernetes':['kubernetes','k8s','helm','kubectl'],
   'Terraform / IaC':['terraform','pulumi','ansible','iac','infrastructure as code'],'AWS / Cloud':['aws','gcp','azure','cloudflare','serverless','lambda'],
   'GraphQL':['graphql','apollo'],'Databases':['postgres','postgresql','mysql','mongodb','redis','sqlite','prisma','dynamodb'],
-  'ML / AI':['tensorflow','pytorch','machine learning','machine-learning','deep learning','deep-learning','llm','nlp','transformers'],
+  'LLM / GenAI':['llm','llms','large language model','genai','generative ai','openai','anthropic','claude','gpt-4','gpt4','llama','mistral','gemini','hugging face','huggingface','ollama','vllm','prompt engineering'],
+  'AI agents':['agent','agents','agentic','langgraph','langchain','llamaindex','llama-index','crewai','autogen','openai agents','agents sdk','tool calling','tool-calling','function calling','multi-agent','agent harness','orchestration loop'],
+  'RAG / vector search':['rag','retrieval augmented','retrieval-augmented','vector database','vector db','vector store','vector stores','embeddings','pinecone','weaviate','chroma','chromadb','faiss','qdrant','milvus','pgvector'],
+  'MCP / tool integration':['mcp','model context protocol','tool integration','function schema','structured output'],
+  'ML / deep learning':['tensorflow','pytorch','scikit-learn','sklearn','keras','jax','transformers','fine-tuning','fine-tune','nlp','computer vision','xgboost','machine learning','machine-learning','deep learning','deep-learning'],
+  'MLOps / evals':['mlops','mlflow','weights & biases','wandb','langsmith','langfuse','eval','evals','evaluation harness','benchmark','model serving','inference server','triton','ray serve'],
   'CI/CD':['github actions','github-actions','ci/cd','jenkins','circleci','gitlab-ci'],'Testing':['jest','pytest','cypress','playwright','vitest','unit testing'],
   'Mobile':['flutter','react native','react-native','ios','android','swiftui'],'Kafka / streaming':['kafka','rabbitmq','pubsub','event streaming'],
   'Microservices':['microservice','microservices','distributed systems','system design'],
@@ -467,6 +472,9 @@ function analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,col
   const ghProven=presentSkills(ghBlob);
   const skillHits={};owned.forEach(r=>{const hay=((r.name||'')+' '+(r.description||'')+' '+((r.topics||[]).join(' '))+' '+(r.language||'')).toLowerCase();for(const[s,keys]of Object.entries(SKILLS))if(keys.some(k=>textHas(' '+hay+' ',k)))skillHits[s]=(skillHits[s]||0)+1;});
   const skills=Object.entries(skillHits).sort((a,b)=>b[1]-a[1]).map(([n,c])=>({name:n,pct:pct(c,owned.length||1),count:c})).slice(0,12);
+  const AISET=['LLM / GenAI','AI agents','RAG / vector search','MCP / tool integration','ML / deep learning','MLOps / evals'];
+  const aiHits=AISET.filter(s=>ghProven.has(s));
+  const aiRepoCount=Object.entries(skillHits).filter(([s])=>AISET.includes(s)).reduce((n,kv)=>n+kv[1],0);
   const linProven=linkedin?presentSkills(linkedin):new Set();const jdReq=jd?presentSkills(jd):new Set();
   const stars=owned.reduce((a,r)=>a+r.stargazers_count,0),topStars=owned.reduce((m,r)=>Math.max(m,r.stargazers_count),0);
   const topRepos=[...owned].sort((a,b)=>b.stargazers_count-a.stargazers_count).slice(0,5);
@@ -511,10 +519,10 @@ function analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,col
   else if(senior>=2||mid>=3){level='Mid → Senior signal';levelWhy='Solid independent projects and range; limited large-scale public traction.';}
   else if(mid>=2){level='Junior → Mid signal';levelWhy='Real building activity, still light on impact/depth in public work.';}
   else{level='Early / thin public signal';levelWhy='Not enough public evidence to place a level.';}
-  return {profile,owned,forks,langs,deepLang,fePct,bePct,lean,skills,stars,topStars,topRepos,commits,commitBasis,activeDays,daysSince,privateCount,totalContrib,streak,calendar,prs,issues,ageYears,ageDays,followers,following,originalPct,emptyPct,score,comps,weights,level,levelWhy,hasToken,contrib:!!contrib,ghProven,linProven,jdReq,jdMatch,hasLinkedin:!!linkedin,hasJd:!!jd,jdText:jd,linkedinText:linkedin,collab,collabMeasured,learnPct};
+  return {profile,owned,forks,langs,deepLang,fePct,bePct,lean,skills,stars,topStars,topRepos,commits,commitBasis,activeDays,daysSince,privateCount,totalContrib,streak,calendar,prs,issues,ageYears,ageDays,followers,following,originalPct,emptyPct,score,comps,weights,level,levelWhy,hasToken,contrib:!!contrib,ghProven,linProven,jdReq,jdMatch,hasLinkedin:!!linkedin,hasJd:!!jd,jdText:jd,linkedinText:linkedin,collab,collabMeasured,learnPct,aiHits,aiRepoCount};
 }
 
-function heatmap(cal){if(!cal||!cal.length)return'';const max=Math.max(...cal.map(d=>d.contributionCount),1);const color=c=>{if(c===0)return'var(--panel2)';const r=c/max;return r<=0.25?'#5a3d12':r<=0.5?'#8a5c15':r<=0.75?'#cf8a1e':'var(--amber)';};const cell=11,gap=2,weeks=[];for(let i=0;i<cal.length;i+=7)weeks.push(cal.slice(i,i+7));const w=weeks.length*(cell+gap),h=7*(cell+gap);let rects='';weeks.forEach((wk,x)=>wk.forEach((d,y)=>{rects+=`<rect x="${x*(cell+gap)}" y="${y*(cell+gap)}" width="${cell}" height="${cell}" rx="2" fill="${color(d.contributionCount)}"><title>${d.date}: ${d.contributionCount}</title></rect>`;}));return `<div class="heat"><svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${rects}</svg></div><div class="heatleg">Less <i style="background:var(--panel2)"></i><i style="background:#5a3d12"></i><i style="background:#8a5c15"></i><i style="background:#cf8a1e"></i><i style="background:var(--amber)"></i> More · last 12 months</div>`;}
+function heatmap(cal){if(!cal||!cal.length)return'';const max=Math.max(...cal.map(d=>d.contributionCount),1);const color=c=>{if(c===0)return'var(--panel2)';const r=c/max;return r<=0.25?'#9be9a8':r<=0.5?'#40c463':r<=0.75?'#30a14e':'#216e39';};const cell=11,gap=2,weeks=[];for(let i=0;i<cal.length;i+=7)weeks.push(cal.slice(i,i+7));const w=weeks.length*(cell+gap),h=7*(cell+gap);let rects='';weeks.forEach((wk,x)=>wk.forEach((d,y)=>{rects+=`<rect x="${x*(cell+gap)}" y="${y*(cell+gap)}" width="${cell}" height="${cell}" rx="2" fill="${color(d.contributionCount)}"><title>${d.date}: ${d.contributionCount}</title></rect>`;}));return `<div class="heat"><svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${rects}</svg></div><div class="heatleg">Less <i style="background:var(--panel2)"></i><i style="background:#9be9a8"></i><i style="background:#40c463"></i><i style="background:#30a14e"></i><i style="background:#216e39"></i> More · last 12 months</div>`;}
 function donut(p){const c=pctColor(p),R=42,C=2*Math.PI*R,off=C*(1-p/100);return `<div class="jddonut"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="${R}" fill="none" stroke="var(--panel2)" stroke-width="9"/><circle cx="48" cy="48" r="${R}" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 48 48)"/></svg><div class="lbl"><b style="color:${c}">${p}%</b><s>JD MATCH</s></div></div>`;}
 
 function contactSection(profile,social){
@@ -752,8 +760,17 @@ function classifyEngineer(a){
   const strongDominant=langPct>=75;
   const devops=['Docker','Kubernetes','Terraform / IaC'].filter(n=>a.ghProven.has(n)).length;
   let kind='',stack='';
-  if(lean.includes('Data')){kind='ML / Data Engineer';stack=lang||'Python';}
-  else if(lean.includes('Mobile')){const ml=a.langs.find(l=>['Swift','Kotlin','Dart','Objective-C'].includes(l.name));kind='Mobile Engineer';stack=a.ghProven.has('Mobile')&&!ml?'Flutter / RN':(ml?ml.name:'Mobile');}
+  const agentic=a.ghProven.has('AI agents')||a.ghProven.has('MCP / tool integration');
+  const llm=a.ghProven.has('LLM / GenAI')||a.ghProven.has('RAG / vector search');
+  const ml=a.ghProven.has('ML / deep learning');
+  const mlops=a.ghProven.has('MLOps / evals');
+  const aiDepth=a.aiRepoCount||0;
+  const aiLang=(lang&&['Python','TypeScript','Go','Rust'].includes(lang))?lang:'Python';
+  if(agentic&&(llm||mlops||a.ghProven.has('MCP / tool integration'))){kind=strongDominant?'Core AI / Agent Infrastructure Engineer':'AI / Agent Infrastructure Engineer';stack=aiLang;}
+  else if(llm&&aiDepth>=2&&!ml){kind='Applied AI / LLM Engineer';stack=lang||'Python';}
+  else if(ml&&mlops){kind='ML / MLOps Engineer';stack=lang||'Python';}
+  else if(lean.includes('Data')||ml){kind='Machine Learning Engineer';stack=lang||'Python';}
+  else if(lean.includes('Mobile')){const ml2=a.langs.find(l=>['Swift','Kotlin','Dart','Objective-C'].includes(l.name));kind='Mobile Engineer';stack=a.ghProven.has('Mobile')&&!ml2?'Flutter / RN':(ml2?ml2.name:'Mobile');}
   else if(lean==='Full-stack'){kind='Full-stack Engineer';const fw=['React','Vue / Nuxt','Angular','Svelte'].find(n=>a.ghProven.has(n));const beLang=(a.langs.find(l=>BE.has(l.name))||{}).name;const feName=fw?fw.split(' ')[0]:(a.langs.find(l=>['TypeScript','JavaScript'].includes(l.name))?'JS':'');const beName=beLang||(a.ghProven.has('Node.js')?'Node':'');stack=[feName,beName].filter(Boolean).join(' / ')||(lang||'');}
   else if(lean.includes('Backend')){let beLang=(a.langs.find(l=>BE.has(l.name))||{}).name||lang;if(a.ghProven.has('Node.js')&&['JavaScript','TypeScript'].includes(beLang))stack='Node.js';else stack=beLang||'';kind=strongDominant?'Core Backend Engineer':'Backend Engineer';if(devops>=2)kind=strongDominant?'Core Backend / Platform Engineer':'Backend / Platform Engineer';}
   else if(lean.includes('Frontend')){const fw=['React','Vue / Nuxt','Angular','Svelte'].find(n=>a.ghProven.has(n));stack=fw?fw.split(' ')[0]:(lang||'JS/TS');kind=strongDominant?'Core Frontend Engineer':'Frontend Engineer';}
@@ -766,11 +783,17 @@ function classifyEngineer(a){
   if(a.owned.length<4||lean.includes('Unclear'))conf='Low';
   else if((strongDominant||lean==='Full-stack')&&a.owned.length>=8&&(a.deepLang||a.contrib))conf='High';
   const tags=[];
-  if(lean&&!lean.includes('Unclear'))tags.push(lean.replace(' leaning',''));
+  if(a.ghProven.has('AI agents'))tags.push('Agents');
+  if(a.ghProven.has('MCP / tool integration'))tags.push('MCP / tool-calling');
+  if(a.ghProven.has('RAG / vector search'))tags.push('RAG');
+  if(a.ghProven.has('LLM / GenAI'))tags.push('LLM');
+  if(a.ghProven.has('MLOps / evals'))tags.push('Evals / MLOps');
+  if(a.ghProven.has('ML / deep learning')&&!tags.includes('LLM'))tags.push('ML');
+  if(lean&&!lean.includes('Unclear')&&!kind.includes('AI')&&!kind.includes('ML')&&!kind.includes('Machine'))tags.push(lean.replace(' leaning',''));
   if(lang)tags.push(lang+' '+langPct+'%');
   if(a.daysSince<=60)tags.push('Actively shipping');else if(a.daysSince>365)tags.push('Dormant');
   if(a.collab&&a.collab.notable&&a.collab.notable.some(n=>n.stars>=200))tags.push('OSS contributor');
-  if(devops>=2)tags.push('DevOps-capable');
+  if(devops>=2&&!kind.includes('AI'))tags.push('DevOps-capable');
   if(a.stars>=100)tags.push('High-traction');
   tags.push(a.level.split(' signal')[0]);
   return {label,kind,stack,conf,reasons,tags};
@@ -799,7 +822,15 @@ function finalDecisionSection(a,cls){
     <div class="fdconf" style="color:${confColor}">Confidence: ${cls.conf}${cls.reasons.length?' — based on '+cls.reasons.join(', '):''}. Public GitHub only — confirm in a live technical loop.</div>
   </section>`;
 }
-function bestFit(a){if(a.lean.includes('Data'))return'ML / data engineering';if(a.lean.includes('Mobile'))return'Mobile engineering';if(a.lean==='Full-stack')return'Full-stack / product engineering';if(a.lean.includes('Frontend'))return'Frontend / UI engineering';if(a.lean.includes('Backend'))return'Backend / platform engineering';return'Needs interview to place';}
+function bestFit(a){
+  const agentic=a.ghProven.has('AI agents')||a.ghProven.has('MCP / tool integration');
+  const llm=a.ghProven.has('LLM / GenAI')||a.ghProven.has('RAG / vector search');
+  const ml=a.ghProven.has('ML / deep learning'),mlops=a.ghProven.has('MLOps / evals');
+  if(agentic&&(llm||mlops))return'AI / agent infrastructure';
+  if(llm&&(a.aiRepoCount||0)>=2&&!ml)return'Applied AI / LLM engineering';
+  if(ml&&mlops)return'ML / MLOps engineering';
+  if(ml||a.lean.includes('Data'))return'Machine learning / data';
+  if(a.lean.includes('Mobile'))return'Mobile engineering';if(a.lean==='Full-stack')return'Full-stack / product engineering';if(a.lean.includes('Frontend'))return'Frontend / UI engineering';if(a.lean.includes('Backend'))return'Backend / platform engineering';return'Needs interview to place';}
 function placement(a){const disc=bestFit(a),lvl=a.level.split(' signal')[0];
   if(a.jdMatch){const m=a.jdMatch;if(m.matchPct>=75)return `Strong fit for this role (${m.matchPct}% match, mostly proven). Move to interview; confirm ${m.claimedOnly.length?'claimed-only skills':'depth'} live.`;if(m.matchPct>=50)return `Partial fit (${m.matchPct}%). Worth a screen if the gaps (${m.gaps.slice(0,3).join(', ')||'none major'}) are learnable.`;return `Weak fit for this role (${m.matchPct}%). Core JD skills aren't evidenced. Advance only with a plan to test the gaps.`;}
   if(a.score>=7.5)return `Move to interview. Target: ${disc} at ${lvl.replace('/','or')}.`;
