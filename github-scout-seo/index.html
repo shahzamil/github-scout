@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Recruiting Tool for Candidate Sourcing | GitHub Scout</title>
+<meta name="description" content="Find and evaluate software engineering candidates using public GitHub activity, role matching, commits, languages, and recruiter-ready signal reports.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="author" content="GitHub Scout">
+<meta name="theme-color" content="#4f46e5">
+<link rel="canonical" href="https://github-scout-three.vercel.app/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="GitHub Scout">
+<meta property="og:title" content="GitHub Scout — Find and Evaluate Software Engineers">
+<meta property="og:description" content="A free GitHub recruiting tool for finding candidates and evaluating developer profiles using public, evidence-based signals.">
+<meta property="og:url" content="https://github-scout-three.vercel.app/">
+<meta property="og:image" content="https://github-scout-three.vercel.app/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="GitHub Scout candidate sourcing and developer evaluation tool">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GitHub Scout — Find and Evaluate Software Engineers">
+<meta name="twitter:description" content="Find candidates and evaluate developer profiles using public GitHub evidence.">
+<meta name="twitter:image" content="https://github-scout-three.vercel.app/og-image.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "GitHub Scout",
+  "url": "https://github-scout-three.vercel.app/",
+  "description": "A free GitHub recruiting tool that helps technical recruiters find software engineering candidates and evaluate public developer activity against a job description.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript and a modern web browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "GitHub candidate search",
+    "Developer profile evaluation",
+    "Job description matching",
+    "Public repository and contribution analysis",
+    "Recruiter shortlist export"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is GitHub Scout?",
+      "acceptedAnswer": {"@type": "Answer", "text": "GitHub Scout is a free recruiting tool for finding software engineering candidates and evaluating public GitHub activity against a job description."}
+    },
+    {
+      "@type": "Question",
+      "name": "What developer signals does GitHub Scout evaluate?",
+      "acceptedAnswer": {"@type": "Answer", "text": "It reviews public repositories, languages, recent activity, original work, stars, collaboration, contribution history when available, and skills relevant to a pasted job description."}
+    },
+    {
+      "@type": "Question",
+      "name": "Does GitHub Scout store my GitHub token or job description?",
+      "acceptedAnswer": {"@type": "Answer", "text": "The token, saved job description, and pasted LinkedIn text stay in the user's browser. LinkedIn text is not saved by the application."}
+    }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --panel2:#f1f5f9; --border:#e6e8ec;
+    --text:#0f172a; --muted:#64748b; --faint:#94a3b8;
+    --amber:#4f46e5; --amber-dim:#eef2ff;
+    --red:#dc2626; --orange:#ea580c; --yellow:#d97706; --green:#16a34a;
+    --barfill:#6366f1; --claim:#9333ea; --blue:#2563eb;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+    --shadow:0 1px 2px rgba(15,23,42,.04),0 1px 3px rgba(15,23,42,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);
+    -webkit-font-smoothing:antialiased;line-height:1.5}
+  a{color:var(--amber)}
+  .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 80px}
+
+  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:24px}
+  .brand .logo{font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:-.02em;margin:0}
+  .brand .tag{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
+  .brand .amber{color:var(--amber)}
+  .mode{font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);color:var(--faint);white-space:nowrap}
+  .mode.deep{color:var(--green);border-color:#a7f3d0;background:#ecfdf5}
+  .mode.basic{color:#b45309;border-color:#fde68a;background:#fffbeb}
+
+  .search{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .field{flex:1;min-width:220px;display:flex;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:0 12px}
+  .field span{font-family:var(--mono);color:var(--faint);font-size:14px}
+  .field input{flex:1;background:none;border:none;outline:none;color:var(--text);font-family:var(--mono);font-size:15px;padding:13px 6px}
+  .btn{background:var(--amber);color:#fff;border:none;border-radius:10px;padding:13px 22px;font-family:var(--disp);font-weight:700;font-size:14px;cursor:pointer}
+  .btn:hover{filter:brightness(1.06)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .tokrow{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .tokrow input[type=password]{flex:1;min-width:180px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:9px 11px;color:var(--muted);font-family:var(--mono);font-size:12px;outline:none}
+  .remember{font-family:var(--mono);font-size:11px;color:var(--faint);display:flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer}
+
+  details.role{background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;padding:0 14px}
+  details.role summary{cursor:pointer;padding:13px 0;font-family:var(--mono);font-size:12px;color:var(--amber);letter-spacing:.04em;list-style:none;display:flex;justify-content:space-between;align-items:center}
+  details.role summary::-webkit-details-marker{display:none}
+  .sumlabel::before{content:'\25B8 ';color:var(--faint)}
+  details.role[open] .sumlabel::before{content:'\25BE '}
+  .clearjd{font-family:var(--mono);font-size:10px;color:var(--faint);text-decoration:underline;cursor:pointer}
+  .rolegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 0 16px}
+  .rolegrid label{font-family:var(--mono);font-size:11px;color:var(--faint);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+  .rolegrid .saved{color:var(--green)}
+  .rolegrid textarea{width:100%;min-height:120px;resize:vertical;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:var(--body);font-size:13px;outline:none;line-height:1.5}
+  .rolegrid textarea:focus{border-color:var(--amber)}
+  @media(max-width:640px){.rolegrid{grid-template-columns:1fr}}
+
+  .hint{font-family:var(--mono);font-size:11px;color:var(--faint);margin-bottom:22px;line-height:1.6}
+  .hint b{color:var(--amber)}
+
+  .status{font-family:var(--mono);font-size:13px;color:var(--muted);padding:8px 0}
+  .status.err{color:var(--red)}
+
+  .phead{display:flex;gap:16px;align-items:center;margin-bottom:22px}
+  .phead img{width:64px;height:64px;border-radius:12px;border:1px solid var(--border)}
+  .phead .nm{font-family:var(--disp);font-weight:700;font-size:20px}
+  .phead .un{font-family:var(--mono);color:var(--muted);font-size:13px}
+  .phead .bio{color:var(--muted);font-size:13px;margin-top:3px;max-width:520px}
+
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+  .stat .k{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase}
+  .stat .v{font-family:var(--disp);font-weight:700;font-size:24px;margin-top:6px}
+  .stat .s{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
+
+  section{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .sh{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.16em;text-transform:uppercase;margin-bottom:16px}
+  .sh .pill{color:var(--green);border:1px solid #a7f3d0;padding:2px 7px;border-radius:12px;margin-left:8px;letter-spacing:.05em}
+  .sh .pill.est{color:#b45309;border-color:#fde68a}
+
+  .contact{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+  .cc{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:11px 13px}
+  .cc .k{font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+  .cc .v{font-size:13px;margin-top:4px;word-break:break-all}
+  .cc a{color:var(--blue)}
+
+  .bar{margin-bottom:11px}
+  .bar .lab{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+  .bar .lab .p{font-family:var(--mono);color:var(--muted);font-size:12px}
+  .track{height:8px;background:var(--panel2);border-radius:6px;overflow:hidden}
+  .fill{height:100%;border-radius:6px;background:var(--barfill);transition:width .6s ease}
+
+  .split{display:flex;height:34px;border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:12px}
+  .split div{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:600;color:#fff}
+  .splitleg{display:flex;gap:18px;font-family:var(--mono);font-size:11px;color:var(--muted);flex-wrap:wrap}
+  .splitleg b{color:var(--text)}
+
+  .repo{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .repo:last-child{border-bottom:none}
+  .repo .rn{font-family:var(--mono);font-size:13px;color:var(--amber)}
+  .repo .rd{font-size:12px;color:var(--muted);margin-top:2px}
+  .repo .rs{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap;text-align:right}
+
+  .heat{overflow-x:auto;padding-bottom:4px}
+  .heatleg{display:flex;gap:6px;align-items:center;font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:8px}
+  .heatleg i{width:11px;height:11px;border-radius:2px;display:inline-block}
+
+  .jdhead{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+  .jddonut{position:relative;width:96px;height:96px;flex-shrink:0}
+  .jddonut .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .jddonut .lbl b{font-family:var(--disp);font-size:26px;font-weight:700}
+  .jddonut .lbl s{font-family:var(--mono);font-size:9px;color:var(--faint);text-decoration:none;letter-spacing:.1em}
+  .jdsum{font-size:14px;flex:1;min-width:220px}
+  table.matrix{width:100%;border-collapse:collapse;font-size:13px}
+  table.matrix th{font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;text-align:center;padding:8px 6px;border-bottom:1px solid var(--border)}
+  table.matrix th:first-child{text-align:left}
+  table.matrix td{padding:9px 6px;border-bottom:1px solid var(--border);text-align:center}
+  table.matrix td:first-child{text-align:left;font-weight:500}
+  .dot{display:inline-block;width:16px;height:16px;line-height:16px;border-radius:50%;font-size:11px;font-family:var(--mono)}
+  .yes{color:var(--green)} .no{color:var(--faint)} .claimdot{color:var(--claim)}
+  .vtag{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:12px}
+  .vtag.proven{color:var(--green);background:#ecfdf5} .vtag.claimed{color:var(--claim);background:#f3e8ff}
+  .vtag.gap{color:var(--red);background:#fef2f2} .vtag.bonus{color:var(--muted);background:var(--panel2)}
+  .legend{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:12px;line-height:1.7}
+
+  .verdict{background:linear-gradient(160deg,#ffffff,#f5f6ff);border:1px solid #e0e2f5;border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow)}
+  .vtop{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+  .vscore{padding:26px 30px;text-align:center;border-right:1px solid var(--border);min-width:160px}
+  .vscore .num{font-family:var(--disp);font-weight:700;font-size:56px;line-height:1}
+  .vscore .out{font-family:var(--mono);font-size:12px;color:var(--faint)}
+  .vscore .band{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-top:8px}
+  .vmeta{flex:1;min-width:240px;padding:22px 26px;display:flex;flex-direction:column;gap:12px;justify-content:center}
+  .vrow{display:flex;gap:10px;align-items:baseline}
+  .vrow .vk{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;width:82px;flex-shrink:0}
+  .vrow .vv{font-size:14px;font-weight:500}
+  .vbody{padding:22px 26px}
+  .vbody h4{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase;margin:0 0 10px}
+  .vbody ul{margin:0 0 18px;padding-left:18px}
+  .vbody li{font-size:14px;margin-bottom:7px}
+  .vbody li.warn{color:#b45309}
+  .breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:6px}
+  .bd{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+  .bd .bk{font-family:var(--mono);font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+  .bd .bv{font-family:var(--disp);font-weight:700;font-size:17px;margin-top:3px}
+  .caveat{background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;font-size:12.5px;color:#9a3412;margin-top:14px;line-height:1.6}
+  .finaldec{background:linear-gradient(160deg,#ffffff,#f7f8fc);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:14px;padding:20px 22px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .finaldec .fdlabel{font-family:var(--disp);font-weight:700;font-size:23px;letter-spacing:-.01em;margin:2px 0 12px}
+  .finaldec .fdtags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+  .finaldec .fdtags span{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:3px 10px}
+  .finaldec .fdtext{font-size:14px;line-height:1.65;margin:0 0 14px}
+  .finaldec .fdrec{font-size:13.5px;color:var(--amber);border-top:1px solid var(--border);padding-top:12px}
+  .finaldec .fdconf{font-family:var(--mono);font-size:11px;margin-top:8px;line-height:1.5}
+
+  .aibar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .aibar .lead{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.12em;text-transform:uppercase;margin-right:6px}
+  .aibtn{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:9px;padding:10px 16px;font-family:var(--disp);font-weight:500;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  .aibtn:hover{border-color:var(--amber)}
+  .aibtn.claude{background:#eef2ff;border-color:#c7d2fe;color:#4f46e5}
+  .aibtn.gpt{background:#ecfdf5;border-color:#a7f3d0;color:#047857}
+  .ainote{font-family:var(--mono);font-size:10px;color:var(--faint);width:100%;margin-top:2px}
+  .outreach .ctx{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .outreach .ctx input{background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px;outline:none}
+  .outreach .ctx input:focus{border-color:var(--amber)}
+  .outreach .draft{margin-bottom:14px}
+  .outreach .draft .dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .outreach .draft .dh span{font-family:var(--mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
+  .outreach textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--body);font-size:13px;padding:11px;line-height:1.55;resize:vertical;outline:none}
+  .outreach textarea:focus{border-color:var(--amber)}
+  .outreach textarea.li{min-height:120px}.outreach textarea.em{min-height:180px}.outreach textarea.xr{min-height:58px}
+  .outreach .subj{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:9px;margin-bottom:6px;outline:none}
+  .copybtn{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:var(--body)}
+  .copybtn:hover{border-color:var(--amber)}
+  @media(max-width:640px){.outreach .ctx{grid-template-columns:1fr}}
+  .reportactions{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .reportactions .ra{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;font-family:var(--body)}
+  .reportactions .ra:hover{border-color:var(--amber)}
+  .reportactions .ra.primary{background:#eef2ff;border-color:#c7d2fe;color:var(--amber);font-weight:600}
+  .shortbar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+  .shortbar button{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;font-family:var(--body)}
+  .shortbar button:hover{border-color:var(--amber)}
+  .strow{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;flex-wrap:wrap;box-shadow:var(--shadow)}
+  .strow .sc{font-family:var(--mono);font-weight:700;font-size:15px;width:34px;text-align:center;flex-shrink:0}
+  .strow .who{flex:1;min-width:150px}
+  .strow .who b{font-size:13px}.strow .who .u{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .strow select,.strow .note{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 8px;font-size:12px;font-family:var(--body);outline:none}
+  .strow select:focus,.strow .note:focus{border-color:var(--amber)}
+  .strow .note{flex:1;min-width:120px}
+  .strow .mini{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 10px;font-size:12px;cursor:pointer;font-family:var(--body)}
+  .strow .mini:hover{border-color:var(--amber)}
+  .empty{color:var(--faint);text-align:center;padding:26px;font-family:var(--mono);font-size:12px}
+  @media print{
+    :root{--bg:#fff;--panel:#fff;--panel2:#f3f4f6;--border:#cfd4dc;--text:#111;--muted:#444;--faint:#666}
+    body{background:#fff}
+    .top,.tabs,.tokrow,#evalView>.search,details.role,.hint,#status,.reportactions,.aibar,.outreach,#findView,#shortView{display:none!important}
+    section,.verdict,.stat,.finaldec,.strow{box-shadow:none;break-inside:avoid;border-color:#cfd4dc}
+  }
+
+  .tabs{display:flex;gap:8px;margin-bottom:16px}
+  .tab{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--disp);font-weight:500;font-size:15px;padding:6px 4px;cursor:pointer}
+  .tab.active{color:var(--text);border-bottom-color:var(--amber)}
+  .segmented{display:inline-flex;background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:3px;margin-bottom:14px}
+  .seg{background:none;border:none;color:var(--muted);font-family:var(--mono);font-size:12px;padding:7px 13px;border-radius:6px;cursor:pointer}
+  .seg.active{background:var(--panel2);color:var(--text)}
+  .findgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+  .findgrid.two{grid-template-columns:1fr 1fr}
+  .findgrid input{background:var(--panel);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:10px;outline:none}
+  .findgrid input:focus{border-color:var(--amber)}
+  .res{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow)}
+  .res img{width:38px;height:38px;border-radius:8px;border:1px solid var(--border)}
+  .res .info{flex:1;min-width:0}
+  .res .info b{font-size:14px}
+  .res .info .sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
+  .res .acts{display:flex;gap:6px;flex-shrink:0}
+  .res .mini{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 11px;font-size:12px;cursor:pointer;font-family:var(--body)}
+  .res .mini:hover{border-color:var(--amber)}
+  .res .mini.eval{color:var(--amber);border-color:#c7d2fe}
+  .contribbadge{font-family:var(--mono);font-size:11px;color:var(--amber);margin-left:6px}
+  .findnote{font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.6;margin:6px 0 10px}
+  @media(max-width:640px){.findgrid{grid-template-columns:1fr 1fr}}
+  .hidden{display:none}
+  .hero{background:linear-gradient(135deg,#fff 0%,#f4f5ff 100%);border:1px solid #e0e2f5;border-radius:16px;padding:24px 26px;margin-bottom:20px;box-shadow:var(--shadow)}
+  .hero h1{font-family:var(--disp);font-size:clamp(26px,4vw,40px);line-height:1.12;letter-spacing:-.035em;margin:0 0 10px;max-width:760px}
+  .hero p{color:var(--muted);font-size:15px;line-height:1.7;margin:0;max-width:780px}
+  .hero strong{color:var(--text)}
+  .seo-content{margin-top:34px}
+  .seo-content section{padding:28px}
+  .seo-content h2{font-family:var(--disp);font-size:24px;letter-spacing:-.02em;margin:0 0 12px}
+  .seo-content h3{font-family:var(--disp);font-size:16px;margin:0 0 7px}
+  .seo-content p,.seo-content li{color:var(--muted);font-size:14px;line-height:1.7}
+  .featuregrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+  .feature{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px}
+  .feature p{margin:0}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px;counter-reset:step}
+  .step{counter-increment:step}
+  .step::before{content:counter(step);display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;background:var(--amber-dim);color:var(--amber);font-family:var(--mono);font-size:12px;font-weight:700;margin-bottom:9px}
+  .step p{margin:0}
+  .faq details{border-top:1px solid var(--border);padding:14px 0}
+  .faq details:last-child{padding-bottom:0}
+  .faq summary{cursor:pointer;font-weight:600;color:var(--text)}
+  .faq details p{margin:8px 0 0}
+  footer{font-family:var(--mono);font-size:11px;color:var(--faint);text-align:center;margin-top:24px}
+  @media(max-width:720px){.featuregrid,.steps{grid-template-columns:1fr}.hero{padding:20px}.seo-content section{padding:22px}}
+  @media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}.vscore{border-right:none;border-bottom:1px solid var(--border);width:100%}}
+  :focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <div class="logo">GitHub <span class="amber">Scout</span></div>
+      <div class="tag">GitHub · LinkedIn · JD match · AI explore</div>
+    </div>
+    <div id="modeBadge" class="mode basic">Basic mode — no token</div>
+  </div>
+
+  <header class="hero">
+    <h1>Find and evaluate software engineers on GitHub</h1>
+    <p><strong>GitHub Scout</strong> is a free GitHub recruiting tool for technical recruiters and hiring teams. Search for developer candidates, assess public coding evidence, compare profiles with a job description, and build an evidence-based shortlist.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" id="tabEval">Evaluate</button>
+    <button class="tab" id="tabFind">Find candidates</button>
+    <button class="tab" id="tabShort">Shortlist <span id="shortCount"></span></button>
+  </div>
+
+  <div class="tokrow">
+    <input id="token" type="password" placeholder="GitHub token — unlocks deep mode + higher search limits" autocomplete="off">
+    <label class="remember"><input type="checkbox" id="remtoken"> remember token on this device</label>
+  </div>
+
+  <div id="evalView">
+  <div class="search">
+    <div class="field"><span>github.com/</span>
+      <input id="user" placeholder="username" autocomplete="off" spellcheck="false">
+    </div>
+    <button class="btn" id="go">Scan</button>
+  </div>
+
+  <details class="role" id="roleBox">
+    <summary><span class="sumlabel">Match against a role — paste LinkedIn text + a job description</span>
+      <span class="clearjd" id="clearJd">clear saved JD</span></summary>
+    <div class="rolegrid">
+      <div>
+        <label>LinkedIn profile text — self-reported (not saved)</label>
+        <textarea id="linkedin" placeholder="Open the candidate's LinkedIn, copy About / Experience / Skills, paste here. LinkedIn has no public API and blocks scraping, so paste is the compliant way. This box is per-candidate and is not saved."></textarea>
+      </div>
+      <div>
+        <label>Job description <span class="saved" id="jdSaved"></span></label>
+        <textarea id="jd" placeholder="Paste the JD once. It's saved on this device and reloads automatically next time."></textarea>
+      </div>
+    </div>
+  </details>
+
+  <div class="hint">
+    <b>Basic</b> (no token): public repos, ~60/hr. <b>Deep</b> (with token): byte-level languages · real commits · private counts · heatmap · 5000/hr.
+    Token, saved JD, and pasted text stay in your browser only.
+  </div>
+
+  <div id="status" class="status"></div>
+  <div id="report" class="hidden"></div>
+  </div><!-- /evalView -->
+
+  <div id="findView" class="hidden">
+    <div class="segmented">
+      <button class="seg active" id="segSearch">Search users</button>
+      <button class="seg" id="segContrib">Contributors of repo / org</button>
+      <button class="seg" id="segXray">Boolean / X-ray</button>
+    </div>
+
+    <div id="searchPanel">
+      <div class="findgrid">
+        <input id="fLang" placeholder="language e.g. Go">
+        <input id="fLoc" placeholder="location e.g. Jakarta">
+        <input id="fFollowers" placeholder="min followers e.g. 50" inputmode="numeric">
+        <input id="fRepos" placeholder="min public repos e.g. 10" inputmode="numeric">
+        <input id="fMinPct" placeholder="min % of repos in that language e.g. 50" inputmode="numeric">
+        <input id="fKeyword" placeholder="keyword in profile (optional)">
+      </div>
+      <button class="btn" id="runSearch">Search GitHub</button>
+      <div class="findnote">When you set a <b>language</b>, the tool checks each result's repos and keeps only those where that language is a real share of their work (default \u226540%), ranked by depth — so a 2%-Go dabbler drops below a 90%-Go engineer. This fetches each candidate's repos, so <b>use a token</b>. Public footprint only.</div>
+    </div>
+
+    <div id="contribPanel" class="hidden">
+      <div class="findgrid two">
+        <input id="cRepo" placeholder="repo:  owner/name   e.g. tokopedia/gripmock">
+        <input id="cOrg" placeholder="or org:  name   e.g. tokopedia">
+      </div>
+      <button class="btn" id="runContrib">Find contributors</button>
+      <div class="findnote">Repo = contributors of one repo. Org = aggregates contributors across the org's most recently active repos (up to 12) and ranks by commit count. Org mode uses many API calls — <b>add a token</b>.</div>
+    </div>
+
+    <div id="xrayPanel" class="hidden">
+      <div class="findgrid">
+        <input id="xTitle" placeholder="job titles e.g. Senior Go Engineer, Backend Engineer">
+        <input id="xSkills" placeholder="must-have skills e.g. Go, gRPC, Kubernetes">
+        <input id="xLoc" placeholder="locations e.g. Jakarta, Indonesia">
+        <input id="xCompany" placeholder="target companies (optional) e.g. Tokopedia, Gojek">
+        <input id="xExclude" placeholder="exclude words e.g. recruiter, hiring, student">
+      </div>
+      <button class="btn" id="runXray">Build search strings</button>
+      <div class="findnote">Comma-separate each field. Titles / locations / companies are OR-grouped; skills are all required (AND). These find <b>public profiles</b> on Google & LinkedIn — same public-only bias as everything else here.</div>
+      <div id="xrayOut"></div>
+    </div>
+
+    <div id="findStatus" class="status"></div>
+    <div id="findResults"></div>
+  </div>
+
+  <div id="shortView" class="hidden">
+    <div class="shortbar">
+      <button id="exportCsv">Export CSV</button>
+      <button id="clearShort">Clear all</button>
+      <span id="shortMeta" class="findnote"></span>
+    </div>
+    <div id="shortList"></div>
+  </div>
+
+  <main class="seo-content">
+    <section aria-labelledby="what-is-scout">
+      <h2 id="what-is-scout">Candidate sourcing based on public engineering evidence</h2>
+      <p>Resumes and LinkedIn profiles show what a candidate says they can do. GitHub Scout adds another layer: what their public code, repositories, contributions, languages, and collaboration history demonstrate. Use it as a focused research assistant during technical sourcing—not as a replacement for interviews or human judgment.</p>
+      <div class="featuregrid">
+        <article class="feature">
+          <h3>Find developer candidates</h3>
+          <p>Search GitHub users by language, location, public repositories, followers, and profile keywords, or explore contributors to a repository or organization.</p>
+        </article>
+        <article class="feature">
+          <h3>Evaluate GitHub profiles</h3>
+          <p>Review activity, original repositories, language depth, collaboration, project traction, skills, recency, and other visible technical signals.</p>
+        </article>
+        <article class="feature">
+          <h3>Match candidates to a role</h3>
+          <p>Paste a job description to separate skills proven in public code from skills claimed in supplied profile text and gaps that need interview validation.</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="how-it-works">
+      <h2 id="how-it-works">How GitHub Scout works</h2>
+      <div class="steps">
+        <article class="step"><h3>Search or enter a username</h3><p>Find relevant developers or paste a known GitHub username into the evaluator.</p></article>
+        <article class="step"><h3>Add role context</h3><p>Optionally paste the job description and candidate profile text for a role-specific comparison.</p></article>
+        <article class="step"><h3>Review the evidence</h3><p>Use the report, caveats, and shortlist tools to decide who deserves deeper human review.</p></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="responsible-use">
+      <h2 id="responsible-use">Designed for responsible technical recruiting</h2>
+      <p>Public GitHub activity is incomplete by nature. Many excellent engineers work mainly in private repositories, use different accounts, or contribute outside GitHub. Treat a thin public profile as missing evidence—not proof of weak ability. Validate every hiring decision through structured interviews, work samples, references, and role-relevant assessment.</p>
+    </section>
+
+    <section class="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">Frequently asked questions</h2>
+      <details><summary>What is GitHub Scout?</summary><p>GitHub Scout is a free candidate sourcing and developer profile evaluation tool. It helps recruiters interpret public GitHub signals and compare them with a job description.</p></details>
+      <details><summary>What signals does it evaluate?</summary><p>Depending on the available public data and mode, GitHub Scout reviews repositories, languages, recent activity, original work, stars, collaboration, contribution history, and role-relevant skills.</p></details>
+      <details><summary>Does a low score mean someone is a weak engineer?</summary><p>No. The score summarizes visible public evidence only. Private work, company code, offline projects, and unlisted experience are not observable and must not be treated as negative evidence.</p></details>
+      <details><summary>Is my GitHub token stored on a server?</summary><p>No. The token, saved job description, and pasted text stay in your browser. Only enable “remember token” on a device you trust.</p></details>
+      <details><summary>Is this an official GitHub product?</summary><p>No. GitHub Scout is an independent recruiting tool and is not affiliated with or endorsed by GitHub.</p></details>
+    </section>
+  </main>
+
+  <footer>GitHub Scout · Public evidence is context, not a hiring decision.</footer>
+</div>
+
+<noscript><p style="max-width:760px;margin:40px auto;padding:20px;font-family:system-ui">GitHub Scout requires JavaScript to search for and evaluate developer candidates.</p></noscript>
+
+<script>
+const $ = id => document.getElementById(id);
+const status = $('status'), report = $('report');
+
+/* ---------- persistence (works on deployed site / local file; no-op in sandbox) ---------- */
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const savedJd=lsGet('scout_jd'); if(savedJd){$('jd').value=savedJd;$('roleBox').open=true;$('jdSaved').textContent='· saved ✓';}
+  const rem=lsGet('scout_remember')==='1';
+  if(rem){$('remtoken').checked=true; const t=lsGet('scout_token'); if(t){$('token').value=t; syncMode();}}
+  ['xTitle','xSkills','xLoc','xCompany','xExclude'].forEach(id=>{const v=lsGet('scout_'+id);if(v&&$(id))$(id).value=v;});
+  // deep-link: ?u=username (used by the Chrome extension "Open in Scout")
+  const qu=new URLSearchParams(location.search).get('u');
+  if(qu){$('user').value=qu.replace(/^@/,''); setTimeout(()=>run(),350);}
+});
+$('jd').addEventListener('input',()=>{const v=$('jd').value;if(v.trim()){lsSet('scout_jd',v);$('jdSaved').textContent='· saved ✓';}else{lsDel('scout_jd');$('jdSaved').textContent='';}});
+$('clearJd').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();$('jd').value='';lsDel('scout_jd');$('jdSaved').textContent='';});
+$('remtoken').addEventListener('change',()=>{if($('remtoken').checked){lsSet('scout_remember','1');lsSet('scout_token',$('token').value.trim());}else{lsDel('scout_remember');lsDel('scout_token');}});
+
+const FE=new Set(['JavaScript','TypeScript','HTML','CSS','SCSS','Less','Vue','Svelte','Elm','CoffeeScript','Astro','Handlebars']);
+const BE=new Set(['Python','Java','Go','Ruby','PHP','C#','Rust','Kotlin','Scala','Elixir','C','C++','Clojure','Perl','Haskell','Erlang','Crystal','OCaml','F#','Groovy','Zig']);
+const MOBILE=new Set(['Swift','Objective-C','Dart','Kotlin']);
+const DATA=new Set(['Jupyter Notebook','R','MATLAB','Julia','Stata','SAS']);
+const SKILLS={
+  'React':['react','next.js','nextjs','next','gatsby','redux','remix'],'Vue / Nuxt':['vue','nuxt','vuex'],
+  'Angular':['angular','ngrx'],'Svelte':['svelte','sveltekit'],
+  'Node.js':['node.js','nodejs','node','express','nestjs','fastify'],
+  'Django / Flask / FastAPI':['django','flask','fastapi'],'Spring / JVM':['spring','springboot','spring boot','micronaut','quarkus'],
+  'Rails':['rails','ruby on rails','ruby-on-rails'],'Laravel / PHP':['laravel','symfony'],
+  'Docker':['docker','dockerfile','container','containers'],'Kubernetes':['kubernetes','k8s','helm','kubectl'],
+  'Terraform / IaC':['terraform','pulumi','ansible','iac','infrastructure as code'],'AWS / Cloud':['aws','gcp','azure','cloudflare','serverless','lambda'],
+  'GraphQL':['graphql','apollo'],'Databases':['postgres','postgresql','mysql','mongodb','redis','sqlite','prisma','dynamodb'],
+  'LLM / GenAI':['llm','llms','large language model','genai','generative ai','openai','anthropic','claude','gpt-4','gpt4','llama','mistral','gemini','hugging face','huggingface','ollama','vllm','prompt engineering'],
+  'AI agents':['agent','agents','agentic','langgraph','langchain','llamaindex','llama-index','crewai','autogen','openai agents','agents sdk','tool calling','tool-calling','function calling','multi-agent','agent harness','orchestration loop'],
+  'RAG / vector search':['rag','retrieval augmented','retrieval-augmented','vector database','vector db','vector store','vector stores','embeddings','pinecone','weaviate','chroma','chromadb','faiss','qdrant','milvus','pgvector'],
+  'MCP / tool integration':['mcp','model context protocol','tool integration','function schema','structured output'],
+  'ML / deep learning':['tensorflow','pytorch','scikit-learn','sklearn','keras','jax','transformers','fine-tuning','fine-tune','nlp','computer vision','xgboost','machine learning','machine-learning','deep learning','deep-learning'],
+  'MLOps / evals':['mlops','mlflow','weights & biases','wandb','langsmith','langfuse','eval','evals','evaluation harness','benchmark','model serving','inference server','triton','ray serve'],
+  'CI/CD':['github actions','github-actions','ci/cd','jenkins','circleci','gitlab-ci'],'Testing':['jest','pytest','cypress','playwright','vitest','unit testing'],
+  'Mobile':['flutter','react native','react-native','ios','android','swiftui'],'Kafka / streaming':['kafka','rabbitmq','pubsub','event streaming'],
+  'Microservices':['microservice','microservices','distributed systems','system design'],
+};
+const LANGS={'JavaScript':['javascript','js'],'TypeScript':['typescript','ts'],'Python':['python'],'Go':['golang','go'],'Java':['java'],'Ruby':['ruby'],'PHP':['php'],'C#':['c#','csharp','.net','dotnet'],'Rust':['rust'],'Kotlin':['kotlin'],'Swift':['swift'],'Scala':['scala'],'Elixir':['elixir'],'C++':['c++','cpp'],'C':['c'],'Dart':['dart']};
+const CANON=[];for(const[n,keys]of Object.entries(SKILLS))CANON.push({name:n,keys});for(const[n,keys]of Object.entries(LANGS))CANON.push({name:n,keys,isLang:true});
+function esc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function textHas(t,key){return new RegExp('(^|[^a-z0-9+#.])'+esc(key.toLowerCase())+'([^a-z0-9+#]|$)','i').test(t);}
+function presentSkills(text){const low=' '+(text||'').toLowerCase()+' ';const set=new Set();CANON.forEach(c=>{if(c.keys.some(k=>textHas(low,k)))set.add(c.name);});return set;}
+
+async function gh(path,token){const h={'Accept':'application/vnd.github+json'};if(token)h['Authorization']='token '+token;
+  const r=await fetch('https://api.github.com'+path,{headers:h});
+  if(r.status===404)throw{code:404};if(r.status===401)throw{code:401};
+  if(r.status===403){throw{code:403,rem:r.headers.get('x-ratelimit-remaining')};}
+  if(!r.ok)throw{code:r.status};return r.json();}
+async function graphql(login,token){
+  const q=`query($login:String!){user(login:$login){contributionsCollection{totalCommitContributions totalPullRequestContributions totalIssueContributions restrictedContributionsCount contributionCalendar{totalContributions weeks{contributionDays{date contributionCount}}}}}}`;
+  const r=await fetch('https://api.github.com/graphql',{method:'POST',headers:{'Authorization':'bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({query:q,variables:{login}})});
+  const d=await r.json();if(d.errors||!d.data||!d.data.user)return null;return d.data.user.contributionsCollection;}
+async function fetchByteLanguages(owned,token){
+  const targets=[...owned].sort((a,b)=>new Date(b.pushed_at)-new Date(a.pushed_at)).slice(0,50);const totals={};
+  for(let i=0;i<targets.length;i+=8){const batch=targets.slice(i,i+8);status.textContent=`Analysing languages… ${Math.min(i+8,targets.length)}/${targets.length} repos`;
+    const res=await Promise.all(batch.map(r=>gh(`/repos/${r.full_name}/languages`,token).catch(()=>({}))));res.forEach(o=>{for(const[l,b]of Object.entries(o))totals[l]=(totals[l]||0)+b;});}
+  return totals;}
+
+async function fetchCollaboration(u,token){
+  const enc=encodeURIComponent;
+  const authored=await gh('/search/issues?q='+enc('author:'+u+' type:pr')+'&per_page=100&sort=updated&order=desc',token);
+  let mergedTotal=null;
+  try{const m=await gh('/search/issues?q='+enc('author:'+u+' type:pr is:merged')+'&per_page=1',token);mergedTotal=m.total_count;}catch(e){}
+  const items=authored.items||[];
+  const ext={};
+  items.forEach(it=>{const ru=it.repository_url||'';const parts=ru.split('/');const owner=parts[parts.length-2],name=parts[parts.length-1];
+    if(owner&&name&&owner.toLowerCase()!==u.toLowerCase()){const full=owner+'/'+name;ext[full]=(ext[full]||0)+1;}});
+  const distinctExternal=Object.keys(ext).length;
+  const externalPRs=Object.values(ext).reduce((a,b)=>a+b,0);
+  const topExt=Object.entries(ext).sort((a,b)=>b[1]-a[1]).slice(0,6).map(e=>e[0]);
+  const notable=[];
+  for(const full of topExt){try{const r=await gh('/repos/'+full,token);notable.push({full,stars:r.stargazers_count,prs:ext[full]});}catch(e){}}
+  notable.sort((a,b)=>b.stars-a.stars);
+  return {authoredPRs:authored.total_count,mergedPRs:mergedTotal,distinctExternal,externalPRs,notable};
+}
+
+const fmt=n=>(n==null)?'0':(n>=1000?(n/1000).toFixed(n>=10000?0:1)+'k':''+n);
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+const daysBetween=(a,b)=>Math.round((a-b)/86400000);
+function scoreColor(v){if(v>=7.5)return'var(--green)';if(v>=5)return'var(--yellow)';if(v>=3)return'var(--orange)';return'var(--red)';}
+function pctColor(v){if(v>=75)return'var(--green)';if(v>=50)return'var(--yellow)';if(v>=30)return'var(--orange)';return'var(--red)';}
+
+function syncMode(){const has=$('token').value.trim();const b=$('modeBadge');b.className='mode '+(has?'deep':'basic');b.textContent=has?'Deep mode — token active':'Basic mode — no token';}
+$('token').addEventListener('input',()=>{syncMode();if($('remtoken').checked)lsSet('scout_token',$('token').value.trim());});
+$('go').onclick=run;
+$('user').addEventListener('keydown',e=>{if(e.key==='Enter')run();});
+
+async function run(){
+  const u=$('user').value.trim().replace(/^@/,'').replace(/.*github\.com\//,'').replace(/\/.*/,'');
+  const token=$('token').value.trim(), linkedin=$('linkedin').value.trim(), jd=$('jd').value.trim();
+  if(!u){status.textContent='Enter a username.';return;}
+  report.classList.add('hidden');status.className='status';status.textContent='Fetching profile…';$('go').disabled=true;
+  try{
+    const profile=await gh('/users/'+encodeURIComponent(u),token);
+    let social=[];try{social=await gh(`/users/${u}/social_accounts`,token);}catch(e){social=[];}
+    status.textContent='Fetching repositories…';
+    let repos=[],page=1;while(page<=3){const b=await gh(`/users/${u}/repos?per_page=100&sort=pushed&page=${page}`,token);repos=repos.concat(b);if(b.length<100)break;page++;}
+    const owned=repos.filter(r=>!r.fork);
+    status.textContent='Reading recent activity…';
+    let events=[];try{events=await gh(`/users/${u}/events/public?per_page=100`,token);}catch(e){events=[];}
+    let contrib=null,byteLangs=null;
+    if(token){status.textContent='Pulling contribution history (GraphQL)…';try{contrib=await graphql(u,token);}catch(e){}try{byteLangs=await fetchByteLanguages(owned,token);}catch(e){}}
+    status.textContent='Checking open-source collaboration…';
+    let collab=null; try{collab=await fetchCollaboration(u,token);}catch(e){collab=null;}
+    status.textContent='';
+    render(profile,repos,events,contrib,byteLangs,!!token,linkedin,jd,social,collab);
+    report.classList.remove('hidden');report.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    status.className='status err';
+    if(e.code===404)status.textContent='No GitHub user with that name.';
+    else if(e.code===401)status.textContent='Token rejected by GitHub — check it, or clear it to run basic mode.';
+    else if(e.code===403)status.textContent='GitHub rate limit hit'+(e.rem==='0'?' (0 left this hour). Add a token to continue.':'. Add a token.');
+    else status.textContent='Something went wrong reaching GitHub ('+(e.code||'network')+'). Try again.';
+  }finally{$('go').disabled=false;}
+}
+
+function analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,collab){
+  const now=Date.now();const owned=repos.filter(r=>!r.fork),forks=repos.filter(r=>r.fork);
+  const deepLang=byteLangs&&Object.keys(byteLangs).length>0;
+  let langs;
+  if(deepLang){const t=Object.values(byteLangs).reduce((a,b)=>a+b,0)||1;langs=Object.entries(byteLangs).sort((a,b)=>b[1]-a[1]).map(([n,b])=>({name:n,pct:Math.round(b/t*100),bytes:b}));}
+  else{const lc={};owned.forEach(r=>{if(r.language)lc[r.language]=(lc[r.language]||0)+1;});const t=Object.values(lc).reduce((a,b)=>a+b,0);langs=Object.entries(lc).sort((a,b)=>b[1]-a[1]).map(([n,c])=>({name:n,pct:pct(c,t),count:c}));}
+  let fe=0,be=0,mob=0,data=0;langs.forEach(l=>{const w=deepLang?l.bytes:l.count;if(FE.has(l.name))fe+=w;if(BE.has(l.name))be+=w;if(MOBILE.has(l.name))mob+=w;if(DATA.has(l.name))data+=w;});
+  const febe=fe+be||1,fePct=Math.round(fe/febe*100),bePct=100-fePct;
+  let lean;if(data>febe*0.6)lean='Data / ML leaning';else if(mob>febe*0.5)lean='Mobile leaning';else if(fe&&be&&Math.abs(fePct-50)<=25)lean='Full-stack';else if(fePct>bePct)lean='Frontend leaning';else if(be)lean='Backend leaning';else lean='Unclear (thin data)';
+  const ghBlob=owned.map(r=>(r.name||'')+' '+(r.description||'')+' '+((r.topics||[]).join(' '))+' '+(r.language||'')).join(' ')+' '+langs.map(l=>l.name).join(' ');
+  const ghProven=presentSkills(ghBlob);
+  const skillHits={};owned.forEach(r=>{const hay=((r.name||'')+' '+(r.description||'')+' '+((r.topics||[]).join(' '))+' '+(r.language||'')).toLowerCase();for(const[s,keys]of Object.entries(SKILLS))if(keys.some(k=>textHas(' '+hay+' ',k)))skillHits[s]=(skillHits[s]||0)+1;});
+  const skills=Object.entries(skillHits).sort((a,b)=>b[1]-a[1]).map(([n,c])=>({name:n,pct:pct(c,owned.length||1),count:c})).slice(0,12);
+  const AISET=['LLM / GenAI','AI agents','RAG / vector search','MCP / tool integration','ML / deep learning','MLOps / evals'];
+  const aiHits=AISET.filter(s=>ghProven.has(s));
+  const aiRepoCount=Object.entries(skillHits).filter(([s])=>AISET.includes(s)).reduce((n,kv)=>n+kv[1],0);
+  const linProven=linkedin?presentSkills(linkedin):new Set();const jdReq=jd?presentSkills(jd):new Set();
+  const stars=owned.reduce((a,r)=>a+r.stargazers_count,0),topStars=owned.reduce((m,r)=>Math.max(m,r.stargazers_count),0);
+  const topRepos=[...owned].sort((a,b)=>b.stargazers_count-a.stargazers_count).slice(0,5);
+  let commits,commitBasis,activeDays,daysSince,privateCount=null,totalContrib=null,streak=0,calendar=null;
+  if(contrib){commits=contrib.totalCommitContributions;commitBasis='last 12 mo (real)';privateCount=contrib.restrictedContributionsCount;totalContrib=contrib.contributionCalendar.totalContributions;calendar=contrib.contributionCalendar.weeks.flatMap(w=>w.contributionDays);activeDays=calendar.filter(d=>d.contributionCount>0).length;const act=calendar.filter(d=>d.contributionCount>0);daysSince=act.length?daysBetween(now,new Date(act[act.length-1].date).getTime()):9999;for(let i=calendar.length-1;i>=0;i--){if(calendar[i].contributionCount>0)streak++;else if(streak>0)break;}}
+  else{const pushes=events.filter(e=>e.type==='PushEvent');commits=pushes.reduce((a,e)=>a+(e.payload?.size||0),0);commitBasis='recent window (est.)';activeDays=[...new Set(events.map(e=>e.created_at?.slice(0,10)))].filter(Boolean).length;const last=events.length?new Date(events[0].created_at).getTime():(repos[0]?new Date(repos[0].pushed_at).getTime():0);daysSince=last?daysBetween(now,last):9999;}
+  const prs=contrib?contrib.totalPullRequestContributions:events.filter(e=>e.type==='PullRequestEvent').length;
+  const issues=contrib?contrib.totalIssueContributions:events.filter(e=>e.type==='IssuesEvent'||e.type==='IssueCommentEvent').length;
+  const ageDays=daysBetween(now,new Date(profile.created_at).getTime()),ageYears=(ageDays/365).toFixed(1);
+  const followers=profile.followers,following=profile.following||0;
+  const originalPct=repos.length?pct(owned.length,repos.length):0;
+  const emptyPct=owned.length?pct(owned.filter(r=>r.stargazers_count===0&&!r.description&&r.size<50).length,owned.length):0;
+  const LEARN=/(tutorial|learn|bootcamp|hello[-_ ]?world|todo[-_ ]?app|test[-_ ]?repo|practice|exercise|course|clone|demo|sample|playground|my[-_ ]?first|coding[-_ ]?challenge)/i;
+  const learnCount=owned.filter(r=>LEARN.test(r.name||'')||LEARN.test(r.description||'')).length;
+  const learnPct=owned.length?pct(learnCount,owned.length):0;
+  const impact=Math.min(10,stars<=0?0.5:Math.log10(stars)*2.4+Math.min(topStars,1000)/500);
+  const recency=daysSince<=7?10:daysSince<=30?8:daysSince<=90?6:daysSince<=180?4:daysSince<=365?2:0.5;
+  const activity=Math.min(10,activeDays/(contrib?18:9)+commits/(contrib?120:25));
+  let originality=repos.length?Math.min(10,originalPct/12+Math.min(owned.length,30)/6):1;
+  if(learnPct>=40)originality*=0.7;
+  const breadth=Math.min(10,langs.length*1.1+skills.length*0.6);
+  const tenure=Math.min(10,ageDays/365*1.6+Math.min(followers,500)/80);
+  let collabScore=null; const collabMeasured=!!collab;
+  if(collab){const notableStarred=collab.notable.filter(n=>n.stars>=50).length;const bigStarred=collab.notable.filter(n=>n.stars>=1000).length;
+    collabScore=Math.min(10,(collab.mergedPRs||0)/6+collab.distinctExternal*0.7+notableStarred*1.4+bigStarred*1.5);}
+  const weights=collabMeasured?{Impact:0.24,Collaboration:0.16,Activity:0.16,Recency:0.12,Originality:0.12,Breadth:0.10,Tenure:0.10}:{Impact:0.30,Activity:0.18,Recency:0.14,Originality:0.14,Breadth:0.14,Tenure:0.10};
+  const comps={Impact:impact,Activity:activity,Recency:recency,Originality:originality,Breadth:breadth,Tenure:tenure};
+  if(collabMeasured)comps.Collaboration=collabScore;
+  let score=0;for(const k in weights)score+=comps[k]*weights[k];score=Math.round(score*10)/10;
+  let jdMatch=null;
+  if(jd&&jdReq.size){
+    const rows=[...jdReq].map(name=>{const g=ghProven.has(name),l=linProven.has(name);return{name,required:true,github:g,linkedin:l,verdict:g?'proven':(l?'claimed':'gap')};});
+    const provenCount=rows.filter(r=>r.verdict==='proven').length,claimedCount=rows.filter(r=>r.verdict==='claimed').length,gapCount=rows.filter(r=>r.verdict==='gap').length;
+    const matchPct=Math.round((provenCount*1+claimedCount*0.5)/rows.length*100);
+    const bonus=[...new Set([...ghProven,...linProven])].filter(n=>!jdReq.has(n)).map(name=>({name,required:false,github:ghProven.has(name),linkedin:linProven.has(name),verdict:'bonus'}));
+    jdMatch={rows,bonus,provenCount,claimedCount,gapCount,matchPct,total:rows.length,gaps:rows.filter(r=>r.verdict==='gap').map(r=>r.name),claimedOnly:rows.filter(r=>r.verdict==='claimed').map(r=>r.name)};
+  }
+  let level,levelWhy;
+  const senior=[topStars>=200,ageDays>365*4,skills.length>=6,stars>=300].filter(Boolean).length;
+  const mid=[topStars>=20,ageDays>365*2,skills.length>=3,owned.length>=8].filter(Boolean).length;
+  if(senior>=3){level='Senior / Staff signal';levelWhy='Sustained output, real traction, broad stack over years.';}
+  else if(senior>=2||mid>=3){level='Mid → Senior signal';levelWhy='Solid independent projects and range; limited large-scale public traction.';}
+  else if(mid>=2){level='Junior → Mid signal';levelWhy='Real building activity, still light on impact/depth in public work.';}
+  else{level='Early / thin public signal';levelWhy='Not enough public evidence to place a level.';}
+  return {profile,owned,forks,langs,deepLang,fePct,bePct,lean,skills,stars,topStars,topRepos,commits,commitBasis,activeDays,daysSince,privateCount,totalContrib,streak,calendar,prs,issues,ageYears,ageDays,followers,following,originalPct,emptyPct,score,comps,weights,level,levelWhy,hasToken,contrib:!!contrib,ghProven,linProven,jdReq,jdMatch,hasLinkedin:!!linkedin,hasJd:!!jd,jdText:jd,linkedinText:linkedin,collab,collabMeasured,learnPct,aiHits,aiRepoCount};
+}
+
+function heatmap(cal){if(!cal||!cal.length)return'';const max=Math.max(...cal.map(d=>d.contributionCount),1);const color=c=>{if(c===0)return'var(--panel2)';const r=c/max;return r<=0.25?'#9be9a8':r<=0.5?'#40c463':r<=0.75?'#30a14e':'#216e39';};const cell=11,gap=2,weeks=[];for(let i=0;i<cal.length;i+=7)weeks.push(cal.slice(i,i+7));const w=weeks.length*(cell+gap),h=7*(cell+gap);let rects='';weeks.forEach((wk,x)=>wk.forEach((d,y)=>{rects+=`<rect x="${x*(cell+gap)}" y="${y*(cell+gap)}" width="${cell}" height="${cell}" rx="2" fill="${color(d.contributionCount)}"><title>${d.date}: ${d.contributionCount}</title></rect>`;}));return `<div class="heat"><svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${rects}</svg></div><div class="heatleg">Less <i style="background:var(--panel2)"></i><i style="background:#9be9a8"></i><i style="background:#40c463"></i><i style="background:#30a14e"></i><i style="background:#216e39"></i> More · last 12 months</div>`;}
+function donut(p){const c=pctColor(p),R=42,C=2*Math.PI*R,off=C*(1-p/100);return `<div class="jddonut"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="${R}" fill="none" stroke="var(--panel2)" stroke-width="9"/><circle cx="48" cy="48" r="${R}" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 48 48)"/></svg><div class="lbl"><b style="color:${c}">${p}%</b><s>JD MATCH</s></div></div>`;}
+
+function contactSection(profile,social){
+  const items=[];
+  items.push(`<div class="cc"><div class="k">GitHub</div><div class="v"><a href="${profile.html_url}" target="_blank" rel="noopener">${profile.html_url.replace('https://','')}</a></div></div>`);
+  if(profile.email)items.push(`<div class="cc"><div class="k">Email (public)</div><div class="v"><a href="mailto:${profile.email}">${profile.email}</a></div></div>`);
+  if(profile.blog){let b=profile.blog;if(!/^https?:/.test(b))b='https://'+b;items.push(`<div class="cc"><div class="k">Website / blog</div><div class="v"><a href="${b}" target="_blank" rel="noopener">${profile.blog}</a></div></div>`);}
+  if(profile.twitter_username)items.push(`<div class="cc"><div class="k">X / Twitter</div><div class="v"><a href="https://x.com/${profile.twitter_username}" target="_blank" rel="noopener">@${profile.twitter_username}</a></div></div>`);
+  if(profile.company)items.push(`<div class="cc"><div class="k">Company</div><div class="v">${profile.company}</div></div>`);
+  if(profile.location)items.push(`<div class="cc"><div class="k">Location</div><div class="v">${profile.location}</div></div>`);
+  if(profile.hireable)items.push(`<div class="cc"><div class="k">Status</div><div class="v" style="color:var(--green)">Marked open to work</div></div>`);
+  (social||[]).forEach(s=>{if(s&&s.url)items.push(`<div class="cc"><div class="k">${(s.provider||'link').replace('_',' ')}</div><div class="v"><a href="${s.url}" target="_blank" rel="noopener">${s.url.replace(/^https?:\/\//,'')}</a></div></div>`);});
+  return `<section><div class="sh">Contact & links <span class="pill est">public only</span></div><div class="contact">${items.join('')}</div>
+    <div class="legend">Only what the candidate has made public on GitHub. Blank fields mean they didn't publish it — not that it doesn't exist.</div></section>`;
+}
+
+function jdSection(a){
+  if(!a.jdMatch)return'';const m=a.jdMatch;
+  const vtag=v=>`<span class="vtag ${v}">${v==='proven'?'Proven (GitHub)':v==='claimed'?'Claimed (LinkedIn)':v==='gap'?'Gap':'Bonus'}</span>`;
+  const yn=(b,cls)=>b?`<span class="dot ${cls}">\u25CF</span>`:`<span class="dot no">\u2013</span>`;
+  const rowHtml=r=>`<tr><td>${r.name}</td><td>${r.required?'<span class="dot yes">\u25CF</span>':'<span class="dot no">\u2013</span>'}</td><td>${yn(r.github,'yes')}</td><td>${yn(r.linkedin,'claimdot')}</td><td>${vtag(r.verdict)}</td></tr>`;
+  const bonusRows=m.bonus.slice(0,8).map(rowHtml).join('');
+  let summary;
+  if(m.matchPct>=75)summary=`Strong match. ${m.provenCount} of ${m.total} required skills are <b>proven in code</b>${m.claimedCount?`, ${m.claimedCount} more only claimed on LinkedIn`:''}.`;
+  else if(m.matchPct>=50)summary=`Partial match. ${m.provenCount} proven, ${m.claimedCount} claimed-only, ${m.gapCount} not found. Probe the claimed and missing ones.`;
+  else summary=`Weak match on paper. Only ${m.provenCount} of ${m.total} required skills show up in their code. ${m.gapCount} not found at all.`;
+  return `<section><div class="sh">Job-description match <span class="pill${a.hasLinkedin?'':' est'}">${a.hasLinkedin?'GitHub + LinkedIn':'GitHub only'}</span></div>
+    <div class="jdhead">${donut(m.matchPct)}<div class="jdsum">${summary}${!a.hasLinkedin?' <span style="color:var(--faint)">Paste LinkedIn text to also credit self-reported skills.</span>':''}</div></div>
+    <table class="matrix"><thead><tr><th>Skill required by JD</th><th>Required</th><th>GitHub<br>(proven)</th><th>LinkedIn<br>(claimed)</th><th>Verdict</th></tr></thead><tbody>${m.rows.map(rowHtml).join('')}</tbody></table>
+    ${bonusRows?`<div class="sh" style="margin:20px 0 10px">Extra skills they have (not in the JD)</div><table class="matrix"><tbody>${bonusRows}</tbody></table>`:''}
+    <div class="legend">Proven = found in their public code. Claimed = only in the LinkedIn text you pasted (self-reported, unverified). Gap = not found in either. Score weights proven 100%, claimed-only 50%.</div></section>`;
+}
+
+/* ---------- AI explore ---------- */
+function buildAIPrompt(a){
+  const p=a.profile;
+  const trim=(s,n)=>{s=(s||'').replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n)+'…':s;};
+  let out=`You are a strict senior engineering interviewer helping evaluate a candidate. Be evidence-only, no flattery, and treat missing evidence as missing (not assumed).\n\n`;
+  out+=`CANDIDATE\n- Name: ${p.name||p.login}\n- GitHub: ${p.html_url} (${p.public_repos} repos, ${fmt(a.followers)} followers, since ${new Date(p.created_at).getFullYear()})\n`;
+  if(p.location)out+=`- Location: ${p.location}\n`;
+  if(p.company)out+=`- Company: ${p.company}\n`;
+  if(p.blog)out+=`- Site: ${p.blog}\n`;
+  if(p.twitter_username)out+=`- X: @${p.twitter_username}\n`;
+  out+=`\nAUTOMATED GITHUB SIGNAL\n- Top languages: ${a.langs.slice(0,6).map(l=>l.name+' '+l.pct+'%').join(', ')||'n/a'}\n- Frontend/Backend: ${a.fePct}/${a.bePct} (${a.lean})\n- Skills seen in code: ${[...a.ghProven].slice(0,14).join(', ')||'n/a'}\n- Stars: ${a.stars}; top repo ${a.topRepos[0]?a.topRepos[0].name+' (★'+a.topRepos[0].stargazers_count+')':'n/a'}\n- Commits: ${a.commits} (${a.commitBasis}); last active ${a.daysSince>365?Math.round(a.daysSince/30)+'mo':a.daysSince+'d'} ago${a.privateCount?`; ${a.privateCount} private contributions in last year`:''}\n- Automated GitHub score: ${a.score}/10 (${a.level})\n`;
+  out+=`- Notable repos: ${a.topRepos.map(r=>r.name+(r.description?' — '+trim(r.description,60):'')).join(' | ')||'n/a'}\n`;
+  if(a.collabMeasured)out+=`- OSS collaboration: ${a.collab.authoredPRs} PRs authored, ${a.collab.mergedPRs!=null?a.collab.mergedPRs:'?'} merged, to ${a.collab.distinctExternal} external repos${a.collab.notable.filter(n=>n.stars>=50).length?` incl. ${a.collab.notable.filter(n=>n.stars>=50).slice(0,3).map(n=>n.full+' (★'+n.stars+')').join(', ')}`:''}\n`;
+  if(a.hasJd){out+=`\nROLE (job description)\n${trim(a.jdText,1200)}\n`;if(a.jdMatch)out+=`Automated JD match: ${a.jdMatch.matchPct}% — proven: ${a.jdMatch.rows.filter(r=>r.verdict==='proven').map(r=>r.name).join(', ')||'none'}; claimed-only: ${a.jdMatch.claimedOnly.join(', ')||'none'}; gaps: ${a.jdMatch.gaps.join(', ')||'none'}\n`;}
+  if(a.hasLinkedin)out+=`\nLINKEDIN (self-reported, provided by recruiter): ${trim(a.linkedinText,500)}\n`;
+  out+=`\nTASKS\n1. Search the web for this person's public professional footprint — personal site, blog, conference talks, notable open-source work, papers, other developer profiles. Use primary sources. Explicitly flag anything uncertain or possibly a different person with the same name.\n2. Assess fit${a.hasJd?' for the role above':' for a senior software engineering role'}. Separate what is PROVEN (public code/work) from what is only CLAIMED (LinkedIn/self-report).\n3. Give: a score out of 10, a seniority read, key strengths, risks/gaps, and 4-6 specific questions to probe in an interview.\nBe explicit about what you could and could not verify.`;
+  return out;
+}
+function openAI(provider){
+  const prompt=window.__scoutPrompt||'';
+  const q=encodeURIComponent(prompt);
+  const url = provider==='claude' ? 'https://claude.ai/new?q='+q : 'https://chatgpt.com/?q='+q;
+  window.open(url,'_blank','noopener');
+}
+function copyPrompt(btn){
+  const t=window.__scoutPrompt||'';
+  navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1500);}).catch(()=>{});
+}
+function buildFootprintPrompt(a){
+  const p=a.profile;
+  const known=[];
+  if(p.email)known.push('email '+p.email);
+  if(p.blog)known.push('site '+p.blog);
+  if(p.twitter_username)known.push('X @'+p.twitter_username);
+  if(p.company)known.push('company '+p.company);
+  if(p.location)known.push('location '+p.location);
+  let out=`Find the public professional footprint and contact details for this software engineer, for recruiting outreach. Use publicly available professional sources only.\n\n`;
+  out+=`PERSON\n- Name: ${p.name||p.login}\n- GitHub: ${p.html_url}\n- Username: ${p.login}\n`;
+  if(known.length)out+=`- Already known from GitHub: ${known.join('; ')}\n`;
+  out+=`- To disambiguate them: top repos ${a.topRepos.slice(0,3).map(r=>r.name).join(', ')||'n/a'}; main languages ${a.langs.slice(0,3).map(l=>l.name).join(', ')||'n/a'}${p.location?'; based in '+p.location:''}\n`;
+  out+=`\nFIND\n1. Their LinkedIn profile — give the URL and say why you believe it's the same person.\n2. A contact / business email. If you have an Apollo.io connector (or any people-enrichment tool) available, use it to find or verify a business email; otherwise report only what is publicly listed.\n3. Other professional presence: personal site, blog, X/Twitter, dev.to, Stack Overflow, conference talks, employer page.\n\nRULES\n- Public professional information only — no private data.\n- This name may match several people. State clearly how confident you are that each result is the same person, and flag uncertainty.\n- Don't guess. If you can't verify something, say so. List each finding with its source link.`;
+  return out;
+}
+function openFootprint(){const q=encodeURIComponent(window.__scoutFootprint||'');window.open('https://claude.ai/new?q='+q,'_blank','noopener');}
+function findSimilarStack(){
+  const a=window.__scoutA; if(!a)return;
+  showTab('find'); showSeg('search');
+  $('fLang').value=a.langs[0]?a.langs[0].name:'';
+  $('fLoc').value=a.profile.location||'';
+  $('fFollowers').value='';$('fRepos').value='';$('fMinPct').value='';$('fKeyword').value='';
+  window.scrollTo({top:0,behavior:'smooth'});
+  runSearch();
+}
+async function findOrbit(){
+  const a=window.__scoutA; if(!a)return;
+  const token=$('token').value.trim();
+  showTab('find');
+  const s=$('findStatus'); s.className='status'; $('findResults').innerHTML='';
+  window.scrollTo({top:0,behavior:'smooth'});
+  const cand=a.profile.login.toLowerCase();
+  const repos=[];
+  if(a.collab&&a.collab.notable)a.collab.notable.forEach(n=>repos.push(n.full));
+  a.topRepos.slice(0,5).forEach(r=>repos.push(a.profile.login+'/'+r.name));
+  const uniq=[...new Set(repos)].slice(0,8);
+  if(!uniq.length){s.className='status err';s.textContent='Not enough repo data to map this candidate\u2019s orbit.';return;}
+  const agg={}; let hitLimit=false;
+  for(let i=0;i<uniq.length;i++){
+    s.textContent=`Mapping @${a.profile.login}'s orbit… repo ${i+1}/${uniq.length}`;
+    let cs; try{cs=await gh('/repos/'+uniq[i]+'/contributors?per_page=100',token);}catch(e){if(e&&e.code===403){hitLimit=true;break;}continue;}
+    (cs||[]).forEach(c=>{
+      if(!c||!c.login)return;
+      if(c.login.toLowerCase()===cand)return;
+      if(c.type==='Bot'||/\[bot\]$/i.test(c.login))return;
+      if(!agg[c.login])agg[c.login]={login:c.login,avatar:c.avatar_url,url:c.html_url,shared:0,contributions:0};
+      agg[c.login].shared+=1; agg[c.login].contributions+=c.contributions||0;
+    });
+  }
+  const list=Object.values(agg).sort((x,y)=>y.shared-x.shared||y.contributions-x.contributions).slice(0,50);
+  s.textContent=`${list.length} people share repos with @${a.profile.login}${hitLimit?' — stopped early (rate limit; add a token)':''}, ranked by shared projects.`;
+  renderResults(list.map(x=>({login:x.login,avatar:x.avatar,url:x.url,badge:x.shared+' shared',sub:`${x.shared} shared repo${x.shared>1?'s':''} · ${fmt(x.contributions)} commits there`})));
+}
+
+function render(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,social,collab){
+  const a=analyse(profile,repos,events,contrib,byteLangs,hasToken,linkedin,jd,collab);
+  window.__scoutPrompt=buildAIPrompt(a);
+  window.__scoutFootprint=buildFootprintPrompt(a);
+  window.__scoutA=a;
+  const cls=classifyEngineer(a);
+  const sc=a.score,col=scoreColor(sc);
+  const fit=[],flags=[];
+  if(a.stars>=100)fit.push(`Public projects have real traction — ${fmt(a.stars)} stars, top repo \u2605${fmt(a.topStars)}.`);
+  else if(a.stars>0)fit.push(`Some external validation: ${a.stars} stars across owned repos.`);
+  if(a.contrib&&a.commits>=500)fit.push(`Heavy verified output — ${fmt(a.commits)} commits in the last 12 months.`);
+  if(a.contrib&&a.privateCount>0)fit.push(`${fmt(a.privateCount)} private contributions last year — a lot of real work is in closed repos.`);
+  if(a.daysSince<=30)fit.push(`Actively coding — last contribution ${a.daysSince} day${a.daysSince===1?'':'s'} ago${a.streak?`, ${a.streak}-day streak`:''}.`);
+  if(a.lean==='Full-stack')fit.push('Ships both frontend and backend.');
+  if(a.skills.length>=5)fit.push(`Range: ${a.skills.slice(0,4).map(s=>s.name).join(', ')} across repos.`);
+  if(a.collab&&a.collab.notable.some(n=>n.stars>=200)){const top=a.collab.notable.filter(n=>n.stars>=200).sort((x,y)=>y.stars-x.stars)[0];fit.push(`Contributes to notable OSS — PRs to ${top.full} (\u2605${fmt(top.stars)}). That's real collaboration, not just solo repos.`);}
+  else if(a.collab&&a.collab.mergedPRs>=20)fit.push(`${fmt(a.collab.mergedPRs)} merged PRs across ${a.collab.distinctExternal} repos they don't own — works well in others' codebases.`);
+  if(a.jdMatch&&a.jdMatch.matchPct>=75)fit.push(`Strong JD fit — ${a.jdMatch.matchPct}% matched, most proven in code.`);
+  if(!fit.length)fit.push('Little in the public record points to a clear strength — weak signal, not necessarily a weak engineer.');
+  if(a.jdMatch&&a.jdMatch.claimedOnly.length)flags.push(`Claimed but not proven: ${a.jdMatch.claimedOnly.join(', ')}. LinkedIn only — verify in interview.`);
+  if(a.jdMatch&&a.jdMatch.gaps.length)flags.push(`Not found anywhere: ${a.jdMatch.gaps.join(', ')}. Either missing or done in private work.`);
+  if(a.daysSince>365)flags.push(`Dormant: no ${a.contrib?'contributions':'public activity'} for ~${Math.round(a.daysSince/30)} months.`);
+  else if(a.daysSince>180)flags.push(`Low recent activity — last active ~${Math.round(a.daysSince/30)} months ago.`);
+  if(a.stars===0)flags.push('Zero stars on owned repos — no external validation of public work.');
+  if(!a.contrib&&!a.hasToken)flags.push('Basic mode: commits estimated, languages use primary-language only. Add a token for exact numbers.');
+  if(a.emptyPct>=40)flags.push(`~${a.emptyPct}% of repos look like empty/placeholder projects.`);
+  if(a.originalPct<40&&repos.length>=6)flags.push(`Only ${a.originalPct}% original repos — rest are forks.`);
+  if(a.learnPct>=40)flags.push(`~${a.learnPct}% of repos look like tutorial/practice/clone projects (by name). Discounted in the score — don't count them as real output.`);
+  if(a.collabMeasured&&a.collab.externalPRs===0&&a.collab.authoredPRs>0)flags.push('No PRs to repos they don\u2019t own in the recent sample — mostly solo work. Fine for some roles, worth probing for team collaboration.');
+  if(a.owned.length<3)flags.push('Very few public repos — ask for private/work samples.');
+
+  const strip=s=>String(s).replace(/<[^>]+>/g,'');
+  window.__scoutSummary=[
+    `GitHub Scout — ${profile.name||profile.login} (@${profile.login})`,
+    `Score ${a.score}/10${a.jdMatch?` · JD match ${a.jdMatch.matchPct}%`:''} · ${a.level} · ${a.lean}`,
+    `Type: ${cls.label} (${cls.conf} confidence)`,
+    profile.html_url,
+    ``,
+    `Languages: ${a.langs.slice(0,5).map(l=>l.name+' '+l.pct+'%').join(', ')||'n/a'}`,
+    `Skills: ${a.skills.slice(0,6).map(s=>s.name).join(', ')||'n/a'}`,
+    `Stars ${a.stars} · Commits ${a.commits} (${a.commitBasis}) · Last active ${a.daysSince>365?Math.round(a.daysSince/30)+'mo':a.daysSince+'d'} ago`,
+    a.collabMeasured?`Collaboration: ${a.collab.mergedPRs!=null?a.collab.mergedPRs+' merged PRs':a.collab.authoredPRs+' PRs'} to ${a.collab.distinctExternal} external repos${a.collab.notable.filter(n=>n.stars>=50).length?'; notable: '+a.collab.notable.filter(n=>n.stars>=50).slice(0,3).map(n=>n.full+' (★'+n.stars+')').join(', '):''}`:'',
+    ``,`WHY FIT:`,...fit.map(f=>' - '+strip(f)),
+    `FLAGS:`,...(flags.length?flags:['none']).map(f=>' - '+strip(f)),
+    ``,`PLACEMENT: ${strip(placement(a))}`
+  ].filter(x=>x!==''||true).join('\n');
+
+  const compRows=Object.keys(a.weights).map(k=>{const v=Math.round(a.comps[k]*10)/10;return `<div class="bd"><div class="bk">${k} · ${Math.round(a.weights[k]*100)}%</div><div class="bv" style="color:${scoreColor(v)}">${v}<span style="font-size:11px;color:var(--faint)">/10</span></div></div>`;}).join('');
+  const langBars=a.langs.slice(0,7).map(l=>`<div class="bar"><div class="lab"><span>${l.name}</span><span class="p">${l.pct}%${a.deepLang?` · ${fmt(l.bytes)}B`:` · ${l.count} repo${l.count>1?'s':''}`}</span></div><div class="track"><div class="fill" style="width:${l.pct}%"></div></div></div>`).join('')||'<div class="status">No language data.</div>';
+  const skillBars=a.skills.map(s=>`<div class="bar"><div class="lab"><span>${s.name}</span><span class="p">${s.pct}% of repos</span></div><div class="track"><div class="fill" style="width:${s.pct}%;background:var(--amber)"></div></div></div>`).join('')||'<div class="status">No framework/tool signals detected.</div>';
+  const repoRows=a.topRepos.map(r=>`<div class="repo"><div><div class="rn">${r.name}</div><div class="rd">${r.description?r.description.slice(0,90):'\u2014 no description \u2014'}</div></div><div class="rs">\u2605 ${fmt(r.stargazers_count)}<br>${r.language||''}</div></div>`).join('')||'<div class="status">No repositories.</div>';
+  const contribSection=a.contrib?`<section><div class="sh">Contribution activity <span class="pill">GraphQL · verified</span></div><div class="grid" style="margin-bottom:16px"><div class="stat"><div class="k">Total contributions</div><div class="v">${fmt(a.totalContrib)}</div><div class="s">last 12 months</div></div><div class="stat"><div class="k">Commits</div><div class="v">${fmt(a.commits)}</div><div class="s">12 mo (public)</div></div><div class="stat"><div class="k">Private contributions</div><div class="v" style="color:${a.privateCount>0?'var(--amber)':'var(--muted)'}">${fmt(a.privateCount)}</div><div class="s">hidden work count</div></div><div class="stat"><div class="k">Current streak</div><div class="v">${a.streak}</div><div class="s">consecutive days</div></div></div>${heatmap(a.calendar)}</section>`:'';
+  const collabSection=a.collabMeasured?`<section><div class="sh">Collaboration & open source <span class="pill est">via PR search</span></div>
+    <div class="grid" style="margin-bottom:16px">
+      <div class="stat"><div class="k">PRs authored</div><div class="v">${fmt(a.collab.authoredPRs)}</div><div class="s">across GitHub</div></div>
+      <div class="stat"><div class="k">Merged PRs</div><div class="v">${a.collab.mergedPRs!=null?fmt(a.collab.mergedPRs):'—'}</div><div class="s">accepted work</div></div>
+      <div class="stat"><div class="k">External repos</div><div class="v">${a.collab.distinctExternal}</div><div class="s">not their own</div></div>
+      <div class="stat"><div class="k">External PRs</div><div class="v">${fmt(a.collab.externalPRs)}</div><div class="s">recent sample</div></div>
+    </div>
+    ${a.collab.notable.filter(n=>n.stars>0).length?`<div class="sh" style="margin-bottom:10px">Notable projects they've contributed to</div>`+a.collab.notable.filter(n=>n.stars>0).map(n=>`<div class="repo"><div class="rn">${n.full}</div><div class="rs">\u2605 ${fmt(n.stars)} · ${n.prs} PR${n.prs>1?'s':''}</div></div>`).join(''):'<div class="status">No external repositories in the recent PR sample.</div>'}
+    <div class="legend">Merged PRs to repos they don't own — especially popular ones — is a stronger seniority signal than solo repo count. Based on their last ~100 authored PRs, so it's a recent sample, not full history.</div></section>`:'';
+  const headlineFit=a.jdMatch?`<div class="vrow"><span class="vk">JD match</span><span class="vv" style="color:${pctColor(a.jdMatch.matchPct)}">${a.jdMatch.matchPct}% (${a.jdMatch.provenCount}/${a.jdMatch.total} proven)</span></div>`:'';
+
+  const aibar=`<div class="aibar"><span class="lead">Explore deeper</span>
+    <button class="aibtn claude" onclick="openAI('claude')">Evaluate in Claude \u2197</button>
+    <button class="aibtn gpt" onclick="openAI('chatgpt')">Evaluate in ChatGPT \u2197</button>
+    <button class="aibtn claude" onclick="openFootprint()">Find footprint \u2197</button>
+    <button class="aibtn" onclick="copyPrompt(this)">Copy prompt</button>
+    <div class="ainote">Opens Claude/ChatGPT in a new tab with a ready prompt (GitHub data ${a.hasJd?'+ your JD ':''}included). "Evaluate" assesses fit; "Find footprint" hunts their LinkedIn, email and socials — and will use your Apollo connector to find a business email if you've linked Apollo to Claude. If a tab opens without the text prefilled, use Copy prompt.</div></div>`;
+  const simbar=`<div class="aibar"><span class="lead">Find similar</span>
+    <button class="aibtn" onclick="findSimilarStack()">By stack + location \u2197</button>
+    <button class="aibtn" onclick="findOrbit()">Same orbit (co-contributors) \u2197</button>
+    <div class="ainote">"By stack" finds more engineers in the same language/location lane (uses the search + depth filter). "Same orbit" finds people who contribute to the same repos as this candidate — a token is recommended (more API calls). Note: similar = similar public footprint, not similar seniority.</div></div>`;
+
+  report.innerHTML=`
+    <div class="reportactions">
+      <button class="ra primary" onclick="scoutSaveShortlist(this)">+ Save to shortlist</button>
+      <button class="ra" onclick="scoutCopySummary(this)">Copy summary</button>
+      <button class="ra" onclick="scoutPrint()">Print / PDF</button>
+    </div>
+    <div class="phead"><img src="${profile.avatar_url}" alt=""><div><div class="nm">${profile.name||profile.login}</div><div class="un">@${profile.login}${profile.location?' · '+profile.location:''}${profile.company?' · '+profile.company:''}</div>${profile.bio?`<div class="bio">${profile.bio}</div>`:''}</div></div>
+    <div class="grid">
+      <div class="stat"><div class="k">Public repos</div><div class="v">${profile.public_repos}</div><div class="s">${a.owned.length} owned · ${a.forks.length} forks</div></div>
+      <div class="stat"><div class="k">Stars received</div><div class="v">${fmt(a.stars)}</div><div class="s">top \u2605${fmt(a.topStars)}</div></div>
+      <div class="stat"><div class="k">Followers</div><div class="v">${fmt(a.followers)}</div><div class="s">follows ${fmt(a.following)}</div></div>
+      <div class="stat"><div class="k">On GitHub</div><div class="v">${a.ageYears}y</div><div class="s">since ${new Date(profile.created_at).getFullYear()}</div></div>
+      <div class="stat"><div class="k">Last active</div><div class="v" style="color:${a.daysSince<=30?'var(--green)':a.daysSince<=180?'var(--yellow)':'var(--red)'}">${a.daysSince>365?Math.round(a.daysSince/30)+'mo':a.daysSince+'d'}</div><div class="s">ago</div></div>
+      <div class="stat"><div class="k">Commits</div><div class="v">${fmt(a.commits)}</div><div class="s">${a.commitBasis}</div></div>
+      <div class="stat"><div class="k">Original repos</div><div class="v">${a.originalPct}%</div><div class="s">not forks</div></div>
+      <div class="stat"><div class="k">PRs / Issues</div><div class="v">${fmt(a.prs)}/${fmt(a.issues)}</div><div class="s">${a.contrib?'12 mo':'recent'}</div></div>
+    </div>
+    <div class="verdict"><div class="vtop">
+      <div class="vscore"><div class="num" style="color:${col}">${sc}</div><div class="out">GitHub score /10</div><div class="band" style="color:${col}">${sc>=7.5?'Strong signal':sc>=5?'Moderate':sc>=3?'Weak':'Thin / low'}</div></div>
+      <div class="vmeta">${headlineFit}<div class="vrow"><span class="vk">Level est.</span><span class="vv">${a.level}</span></div><div class="vrow"><span class="vk">Discipline</span><span class="vv">${a.lean}</span></div><div class="vrow"><span class="vk">Best fit</span><span class="vv">${bestFit(a)}</span></div><div class="vrow"><span class="vk">Data mode</span><span class="vv" style="color:${a.contrib?'var(--green)':'var(--yellow)'}">${a.contrib?'Deep (verified)':'Basic (estimated)'}</span></div></div>
+    </div><div class="vbody">
+      <h4>GitHub score breakdown</h4><div class="breakdown">${compRows}</div>
+      <h4 style="margin-top:22px">Why they could be a fit</h4><ul>${fit.map(f=>`<li>${f}</li>`).join('')}</ul>
+      <h4>Read carefully / red flags</h4><ul>${(flags.length?flags:['Nothing obviously disqualifying in the public data.']).map(f=>`<li class="warn">${f}</li>`).join('')}</ul>
+      <h4>Where to place them</h4><ul><li>${placement(a)}</li><li style="color:var(--muted)">Level rationale: ${a.levelWhy}</li></ul>
+      <div class="caveat"><b>Honesty check:</b> ${a.hasJd?'JD match separates <i>proven in code</i> (GitHub) from merely <i>claimed</i> (LinkedIn). Claimed-only skills are interview questions, not facts; a gap can also mean private work.':(a.contrib?'Deep mode shows verified counts but can\u2019t reveal what private code is. Screening signal, never a verdict.':'GitHub shows only public work. Add a token for verified numbers; always confirm skill in a live loop.')}</div>
+    </div></div>
+    ${finalDecisionSection(a,cls)}
+    ${aibar}
+    ${simbar}
+    ${outreachSection(a)}
+    ${contactSection(profile,social)}
+    ${jdSection(a)}
+    ${contribSection}
+    ${collabSection}
+    <section><div class="sh">Frontend vs Backend <span class="pill${a.deepLang?'':' est'}">${a.deepLang?'byte-level · exact':'primary-language · estimate'}</span></div><div class="split"><div style="width:${a.fePct}%;background:var(--barfill)">${a.fePct>12?'FE '+a.fePct+'%':''}</div><div style="width:${a.bePct}%;background:var(--green)">${a.bePct>12?'BE '+a.bePct+'%':''}</div></div><div class="splitleg"><span>Frontend <b>${a.fePct}%</b></span><span>Backend <b>${a.bePct}%</b></span><span>Lean: <b>${a.lean}</b></span></div></section>
+    <section><div class="sh">Primary languages <span class="pill${a.deepLang?'':' est'}">${a.deepLang?'by bytes':'by repo count'}</span></div>${langBars}</section>
+    <section><div class="sh">Skills detected in code (frameworks · tools · infra)</div>${skillBars}</section>
+    <section><div class="sh">Top repositories by stars</div>${repoRows}</section>
+  `;
+}
+function classifyEngineer(a){
+  const lang=a.langs[0]?a.langs[0].name:null;
+  const langPct=a.langs[0]?a.langs[0].pct:0;
+  const lean=a.lean;
+  const strongDominant=langPct>=75;
+  const devops=['Docker','Kubernetes','Terraform / IaC'].filter(n=>a.ghProven.has(n)).length;
+  let kind='',stack='';
+  const agentic=a.ghProven.has('AI agents')||a.ghProven.has('MCP / tool integration');
+  const llm=a.ghProven.has('LLM / GenAI')||a.ghProven.has('RAG / vector search');
+  const ml=a.ghProven.has('ML / deep learning');
+  const mlops=a.ghProven.has('MLOps / evals');
+  const aiDepth=a.aiRepoCount||0;
+  const aiLang=(lang&&['Python','TypeScript','Go','Rust'].includes(lang))?lang:'Python';
+  if(agentic&&(llm||mlops||a.ghProven.has('MCP / tool integration'))){kind=strongDominant?'Core AI / Agent Infrastructure Engineer':'AI / Agent Infrastructure Engineer';stack=aiLang;}
+  else if(llm&&aiDepth>=2&&!ml){kind='Applied AI / LLM Engineer';stack=lang||'Python';}
+  else if(ml&&mlops){kind='ML / MLOps Engineer';stack=lang||'Python';}
+  else if(lean.includes('Data')||ml){kind='Machine Learning Engineer';stack=lang||'Python';}
+  else if(lean.includes('Mobile')){const ml2=a.langs.find(l=>['Swift','Kotlin','Dart','Objective-C'].includes(l.name));kind='Mobile Engineer';stack=a.ghProven.has('Mobile')&&!ml2?'Flutter / RN':(ml2?ml2.name:'Mobile');}
+  else if(lean==='Full-stack'){kind='Full-stack Engineer';const fw=['React','Vue / Nuxt','Angular','Svelte'].find(n=>a.ghProven.has(n));const beLang=(a.langs.find(l=>BE.has(l.name))||{}).name;const feName=fw?fw.split(' ')[0]:(a.langs.find(l=>['TypeScript','JavaScript'].includes(l.name))?'JS':'');const beName=beLang||(a.ghProven.has('Node.js')?'Node':'');stack=[feName,beName].filter(Boolean).join(' / ')||(lang||'');}
+  else if(lean.includes('Backend')){let beLang=(a.langs.find(l=>BE.has(l.name))||{}).name||lang;if(a.ghProven.has('Node.js')&&['JavaScript','TypeScript'].includes(beLang))stack='Node.js';else stack=beLang||'';kind=strongDominant?'Core Backend Engineer':'Backend Engineer';if(devops>=2)kind=strongDominant?'Core Backend / Platform Engineer':'Backend / Platform Engineer';}
+  else if(lean.includes('Frontend')){const fw=['React','Vue / Nuxt','Angular','Svelte'].find(n=>a.ghProven.has(n));stack=fw?fw.split(' ')[0]:(lang||'JS/TS');kind=strongDominant?'Core Frontend Engineer':'Frontend Engineer';}
+  else {kind='Generalist / Unclear';stack=lang||'';}
+  const label=stack?`${kind} — ${stack}`:kind;
+  let conf='Medium';const reasons=[];
+  reasons.push(a.owned.length+' public repos');
+  if(a.deepLang)reasons.push('byte-level languages');
+  if(a.contrib)reasons.push('verified contributions');
+  if(a.owned.length<4||lean.includes('Unclear'))conf='Low';
+  else if((strongDominant||lean==='Full-stack')&&a.owned.length>=8&&(a.deepLang||a.contrib))conf='High';
+  const tags=[];
+  if(a.ghProven.has('AI agents'))tags.push('Agents');
+  if(a.ghProven.has('MCP / tool integration'))tags.push('MCP / tool-calling');
+  if(a.ghProven.has('RAG / vector search'))tags.push('RAG');
+  if(a.ghProven.has('LLM / GenAI'))tags.push('LLM');
+  if(a.ghProven.has('MLOps / evals'))tags.push('Evals / MLOps');
+  if(a.ghProven.has('ML / deep learning')&&!tags.includes('LLM'))tags.push('ML');
+  if(lean&&!lean.includes('Unclear')&&!kind.includes('AI')&&!kind.includes('ML')&&!kind.includes('Machine'))tags.push(lean.replace(' leaning',''));
+  if(lang)tags.push(lang+' '+langPct+'%');
+  if(a.daysSince<=60)tags.push('Actively shipping');else if(a.daysSince>365)tags.push('Dormant');
+  if(a.collab&&a.collab.notable&&a.collab.notable.some(n=>n.stars>=200))tags.push('OSS contributor');
+  if(devops>=2&&!kind.includes('AI'))tags.push('DevOps-capable');
+  if(a.stars>=100)tags.push('High-traction');
+  tags.push(a.level.split(' signal')[0]);
+  return {label,kind,stack,conf,reasons,tags};
+}
+function finalComments(a,cls){
+  let s0=`A ${cls.kind.toLowerCase()}`;
+  if(cls.stack)s0+=` working mainly in ${cls.stack}`;
+  if(a.langs[0])s0+=` (${a.langs[0].pct}% of their public code)`;
+  s0+='.';
+  const bits=[s0];
+  if(a.contrib)bits.push(a.commits>=300?`Actively shipping, ${fmt(a.commits)} commits in the last year.`:`Lighter recent output (${fmt(a.commits)} commits in the last year).`);
+  else bits.push(a.daysSince<=60?'Recently active on GitHub.':a.daysSince>365?`Public activity has been quiet for ~${Math.round(a.daysSince/30)} months.`:'Moderately active recently.');
+  if(a.collab&&a.collab.mergedPRs>=10)bits.push(`Comfortable in others' codebases \u2014 ${a.collab.mergedPRs} merged PRs across ${a.collab.distinctExternal} external repos.`);
+  else if(a.collabMeasured&&a.collab.externalPRs===0)bits.push('Works mostly solo in public; little cross-repo collaboration is visible.');
+  if(a.stars>=100)bits.push(`Their public work has real traction (${fmt(a.stars)} stars).`);
+  if(a.learnPct>=40)bits.push('A chunk of the repos look like tutorial/practice projects, so weigh the substantive ones.');
+  return bits.join(' ');
+}
+function finalDecisionSection(a,cls){
+  const confColor=cls.conf==='High'?'var(--green)':cls.conf==='Low'?'var(--orange)':'var(--yellow)';
+  return `<section class="finaldec"><div class="sh">Final decision</div>
+    <div class="fdlabel">${cls.label}</div>
+    <div class="fdtags">${cls.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+    <p class="fdtext">${finalComments(a,cls)}</p>
+    <div class="fdrec">Recommendation: ${placement(a)}</div>
+    <div class="fdconf" style="color:${confColor}">Confidence: ${cls.conf}${cls.reasons.length?' — based on '+cls.reasons.join(', '):''}. Public GitHub only — confirm in a live technical loop.</div>
+  </section>`;
+}
+function bestFit(a){
+  const agentic=a.ghProven.has('AI agents')||a.ghProven.has('MCP / tool integration');
+  const llm=a.ghProven.has('LLM / GenAI')||a.ghProven.has('RAG / vector search');
+  const ml=a.ghProven.has('ML / deep learning'),mlops=a.ghProven.has('MLOps / evals');
+  if(agentic&&(llm||mlops))return'AI / agent infrastructure';
+  if(llm&&(a.aiRepoCount||0)>=2&&!ml)return'Applied AI / LLM engineering';
+  if(ml&&mlops)return'ML / MLOps engineering';
+  if(ml||a.lean.includes('Data'))return'Machine learning / data';
+  if(a.lean.includes('Mobile'))return'Mobile engineering';if(a.lean==='Full-stack')return'Full-stack / product engineering';if(a.lean.includes('Frontend'))return'Frontend / UI engineering';if(a.lean.includes('Backend'))return'Backend / platform engineering';return'Needs interview to place';}
+function placement(a){const disc=bestFit(a),lvl=a.level.split(' signal')[0];
+  if(a.jdMatch){const m=a.jdMatch;if(m.matchPct>=75)return `Strong fit for this role (${m.matchPct}% match, mostly proven). Move to interview; confirm ${m.claimedOnly.length?'claimed-only skills':'depth'} live.`;if(m.matchPct>=50)return `Partial fit (${m.matchPct}%). Worth a screen if the gaps (${m.gaps.slice(0,3).join(', ')||'none major'}) are learnable.`;return `Weak fit for this role (${m.matchPct}%). Core JD skills aren't evidenced. Advance only with a plan to test the gaps.`;}
+  if(a.score>=7.5)return `Move to interview. Target: ${disc} at ${lvl.replace('/','or')}.`;
+  if(a.score>=5)return `Worth a screen for ${disc}. Probe depth in interview.`;
+  if(a.score>=3)return `Borderline on GitHub alone. Advance only with work samples or a take-home.`;
+  return `Public data can\u2019t carry a decision. Likely early-career or a private-repo engineer.`;}
+
+/* ---------- proof-first outreach ---------- */
+function escHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escAttr(s){return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function trimDesc(s){s=(s||'').replace(/\s+/g,' ').trim();return s.length>64?s.slice(0,64)+'…':s;}
+function hookPhrase(a){
+  const r=a.topRepos&&a.topRepos[0];
+  if(r&&r.stargazers_count>=5)return `your project ${r.name} (${fmt(r.stargazers_count)}★)${r.description?` — ${trimDesc(r.description)}`:''}`;
+  if(r&&r.description)return `your project ${r.name} — ${trimDesc(r.description)}`;
+  if(a.contrib&&a.commits>=300)return `how consistently you ship on GitHub (${fmt(a.commits)} commits in the last year)`;
+  if(a.langs[0])return `your ${a.langs[0].name} work on GitHub`;
+  return `your GitHub profile`;
+}
+function buildOutreach(a,ctx){
+  const p=a.profile;
+  const first=((p.name||p.login).trim().split(/\s+/)[0])||p.login;
+  const hook=hookPhrase(a);
+  const lang=a.langs[0]?a.langs[0].name:(a.skills[0]?a.skills[0].name:'engineering');
+  const proven=a.jdMatch&&a.jdMatch.rows.find(r=>r.verdict==='proven');
+  const skillLine=proven?`your hands-on ${proven.name}`:`your ${lang} work`;
+  const role=(ctx.role||'').trim()||'a role on our team';
+  const co=(ctx.company||'').trim();
+  const cta=(ctx.cta||'').trim()||'Would you be open to a quick chat?';
+  const sign=(ctx.name||'').trim()?`\n\n– ${ctx.name.trim()}`:'';
+  let li=`Hi ${first}, I came across ${hook} — really solid.\n\n`;
+  if(co)li+=`${co}\n\n`;
+  li+=`We're hiring for ${role} and ${skillLine} lines up well. ${cta}${sign}`;
+  const subj=`${first} — your ${lang} work + ${role}`;
+  let email=`Hi ${first},\n\nI came across ${hook} and wanted to reach out directly.\n\n`;
+  email+=`We're hiring for ${role}, and ${skillLine} is exactly the background we're after.`;
+  if(co)email+=` For context: ${co}`;
+  email+=`\n\n${cta} Either way, happy to share more detail if it's useful — no pressure.${sign}`;
+  return {li,subj,email};
+}
+function outreachSection(a){
+  const ctx={name:lsGet('scout_o_name')||'',company:lsGet('scout_o_co')||'',role:lsGet('scout_o_role')||'',cta:lsGet('scout_o_cta')||''};
+  const d=buildOutreach(a,ctx);
+  return `<section class="outreach"><div class="sh">Proof-first outreach draft <span class="pill est">edit before sending</span></div>
+    <div class="ctx">
+      <input id="oName" placeholder="Your name (sign-off)" value="${escAttr(ctx.name)}" oninput="scoutRegen()">
+      <input id="oRole" placeholder="Role you're hiring e.g. Senior Go Engineer" value="${escAttr(ctx.role)}" oninput="scoutRegen()">
+      <input id="oCo" placeholder="One-line credibility (funding, product, scale)" value="${escAttr(ctx.company)}" oninput="scoutRegen()">
+      <input id="oCta" placeholder="Call to action e.g. Open to a 15-min chat this week?" value="${escAttr(ctx.cta)}" oninput="scoutRegen()">
+    </div>
+    <div class="draft"><div class="dh"><span>LinkedIn / DM — short</span><button class="copybtn" onclick="scoutCopy(this,'oLi')">Copy</button></div>
+      <textarea id="oLi" class="li">${escHtml(d.li)}</textarea></div>
+    <div class="draft"><div class="dh"><span>Email</span><button class="copybtn" onclick="scoutCopyEmail(this)">Copy</button></div>
+      <input id="oSubj" class="subj" value="${escAttr(d.subj)}">
+      <textarea id="oEmail" class="em">${escHtml(d.email)}</textarea></div>
+    <div class="legend">The opening line is pulled from their real GitHub — that specific hook is what stops it reading as mass outreach. If the profile is thin the hook is weak, so rewrite the first line yourself. Never send unedited to a batch. No price in a first message. Your name/role/credibility save on this device and reuse across candidates.</div>
+  </section>`;
+}
+function scoutRegen(){
+  if(!window.__scoutA)return;
+  const ctx={name:$('oName').value,company:$('oCo').value,role:$('oRole').value,cta:$('oCta').value};
+  lsSet('scout_o_name',ctx.name);lsSet('scout_o_co',ctx.company);lsSet('scout_o_role',ctx.role);lsSet('scout_o_cta',ctx.cta);
+  const d=buildOutreach(window.__scoutA,ctx);
+  $('oLi').value=d.li;$('oSubj').value=d.subj;$('oEmail').value=d.email;
+}
+function scoutCopy(btn,id){const t=$(id).value;navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1500);}).catch(()=>{});}
+function scoutCopyEmail(btn){const t='Subject: '+$('oSubj').value+'\n\n'+$('oEmail').value;navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1500);}).catch(()=>{});}
+
+/* ---------- discovery: tabs + search + contributors ---------- */
+function showTab(which){
+  $('evalView').classList.toggle('hidden',which!=='eval');
+  $('findView').classList.toggle('hidden',which!=='find');
+  $('shortView').classList.toggle('hidden',which!=='short');
+  $('tabEval').classList.toggle('active',which==='eval');
+  $('tabFind').classList.toggle('active',which==='find');
+  $('tabShort').classList.toggle('active',which==='short');
+  if(which==='short')renderShortlist();
+}
+$('tabEval').onclick=()=>showTab('eval');
+$('tabFind').onclick=()=>showTab('find');
+$('tabShort').onclick=()=>showTab('short');
+
+const STATUSES=['Sourced','To interview','Interviewing','Offer','Hired','Passed'];
+function getShort(){try{return JSON.parse(lsGet('scout_shortlist')||'[]');}catch(e){return [];}}
+function setShort(a){lsSet('scout_shortlist',JSON.stringify(a));updateShortCount();}
+function updateShortCount(){const el=$('shortCount');if(el){const n=getShort().length;el.textContent=n?'('+n+')':'';}}
+function scoutSaveShortlist(btn){
+  const a=window.__scoutA;if(!a)return;
+  const list=getShort();const login=a.profile.login;
+  if(list.some(x=>x.login.toLowerCase()===login.toLowerCase())){btn.textContent='Already saved ✓';setTimeout(()=>btn.textContent='+ Save to shortlist',1500);return;}
+  list.push({login,name:a.profile.name||login,score:a.score,jdPct:a.jdMatch?a.jdMatch.matchPct:null,lean:a.lean,level:a.level,url:a.profile.html_url,status:'Sourced',note:'',ts:Date.now()});
+  setShort(list);btn.textContent='Saved ✓';setTimeout(()=>btn.textContent='+ Save to shortlist',1500);
+}
+function scoutCopySummary(btn){const t=window.__scoutSummary||'';navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1500);}).catch(()=>{});}
+function scoutPrint(){window.print();}
+function renderShortlist(){
+  const list=getShort().sort((a,b)=>b.score-a.score);
+  $('shortMeta').textContent=list.length?list.length+' candidates saved · sorted by score':'';
+  const el=$('shortList');
+  if(!list.length){el.innerHTML='<div class="empty">No saved candidates yet. Evaluate someone and hit "Save to shortlist".</div>';return;}
+  el.innerHTML=list.map(c=>`<div class="strow">
+    <div class="sc" style="color:${scoreColor(c.score)}">${c.score}</div>
+    <div class="who"><b>${c.name}</b>${c.jdPct!=null?` · JD ${c.jdPct}%`:''}<div class="u">@${c.login} · ${c.lean} · ${c.level}</div></div>
+    <select data-st="${c.login}">${STATUSES.map(s=>`<option ${s===c.status?'selected':''}>${s}</option>`).join('')}</select>
+    <input class="note" data-note="${c.login}" placeholder="note" value="${escAttr(c.note||'')}">
+    <button class="mini" data-open="${c.login}">Open</button>
+    <button class="mini" data-rm="${c.login}">✕</button>
+  </div>`).join('');
+  el.querySelectorAll('[data-st]').forEach(s=>s.onchange=()=>{const l=getShort();const i=l.find(x=>x.login===s.dataset.st);if(i){i.status=s.value;setShort(l);}});
+  el.querySelectorAll('[data-note]').forEach(n=>n.onchange=()=>{const l=getShort();const i=l.find(x=>x.login===n.dataset.note);if(i){i.note=n.value;setShort(l);}});
+  el.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>evaluateFrom(b.dataset.open));
+  el.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{setShort(getShort().filter(x=>x.login!==b.dataset.rm));renderShortlist();});
+}
+function exportCsv(){
+  const list=getShort();if(!list.length)return;
+  const rows=[['login','name','score','jd_match_pct','lean','level','status','note','github_url']];
+  list.forEach(c=>rows.push([c.login,c.name,c.score,c.jdPct==null?'':c.jdPct,c.lean,c.level,c.status,(c.note||'').replace(/\n/g,' '),c.url]));
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');link.href=url;link.download='github-scout-shortlist.csv';link.click();URL.revokeObjectURL(url);
+}
+$('exportCsv').onclick=exportCsv;
+$('clearShort').onclick=()=>{if(confirm('Clear all saved candidates? This cannot be undone.')){setShort([]);renderShortlist();}};
+updateShortCount();
+
+function showSeg(which){
+  $('searchPanel').classList.toggle('hidden',which!=='search');
+  $('contribPanel').classList.toggle('hidden',which!=='contrib');
+  $('xrayPanel').classList.toggle('hidden',which!=='xray');
+  $('segSearch').classList.toggle('active',which==='search');
+  $('segContrib').classList.toggle('active',which==='contrib');
+  $('segXray').classList.toggle('active',which==='xray');
+  if(which==='xray'){$('findResults').innerHTML='';$('findStatus').textContent='';}
+}
+$('segSearch').onclick=()=>showSeg('search');
+$('segContrib').onclick=()=>showSeg('contrib');
+$('segXray').onclick=()=>showSeg('xray');
+
+/* ---------- Boolean / X-ray builder ---------- */
+function xTerms(v){return (v||'').split(',').map(s=>s.trim()).filter(Boolean);}
+function xq(t){return '"'+t.replace(/"/g,'')+'"';}
+function xor(list){return list.length?'('+list.map(xq).join(' OR ')+')':'';}
+function xand(list){return list.length?'('+list.map(xq).join(' AND ')+')':'';}
+function xblock(title,val,g){
+  return `<div class="draft"><div class="dh"><span>${title}</span><div style="display:flex;gap:6px">${g?`<button class="copybtn" data-q="${escAttr(val)}" onclick="xrunGoogle(this)">Run on Google \u2197</button>`:''}<button class="copybtn" data-v="${escAttr(val)}" onclick="xcopy(this)">Copy</button></div></div><textarea class="xr" readonly>${escHtml(val)}</textarea></div>`;
+}
+function xcopy(b){navigator.clipboard.writeText(b.dataset.v).then(()=>{const o=b.textContent;b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1500);}).catch(()=>{});}
+function xrunGoogle(b){window.open('https://www.google.com/search?q='+encodeURIComponent(b.dataset.q),'_blank','noopener');}
+function runXray(){
+  const titles=xTerms($('xTitle').value),skills=xTerms($('xSkills').value),locs=xTerms($('xLoc').value),comps=xTerms($('xCompany').value),excl=xTerms($('xExclude').value);
+  ['xTitle','xSkills','xLoc','xCompany','xExclude'].forEach(id=>lsSet('scout_'+id,$(id).value));
+  if(!titles.length&&!skills.length&&!locs.length){$('xrayOut').innerHTML='<div class="status err" style="padding:10px 0">Add at least a title, skill, or location.</div>';return;}
+  let li=['site:linkedin.com/in'];
+  if(titles.length)li.push(xor(titles));
+  skills.forEach(s=>li.push(xq(s)));
+  if(comps.length)li.push(xor(comps));
+  if(locs.length)li.push(xor(locs));
+  li.push('-intitle:"profiles" -inurl:"dir/"');
+  excl.forEach(e=>li.push('-'+(/\s/.test(e)?xq(e):e)));
+  const liXray=li.filter(Boolean).join(' ');
+  const nb=[];
+  if(titles.length)nb.push(xor(titles));
+  if(skills.length)nb.push(xand(skills));
+  if(comps.length)nb.push(xor(comps));
+  if(locs.length)nb.push(xor(locs));
+  let liBool=nb.filter(Boolean).join(' AND ');
+  if(excl.length)liBool+=' NOT ('+excl.map(xq).join(' OR ')+')';
+  let g=['site:github.com'];
+  skills.forEach(s=>g.push(xq(s)));
+  if(titles.length)g.push(xor(titles));
+  if(locs.length)g.push(xor(locs));
+  excl.forEach(e=>g.push('-'+(/\s/.test(e)?xq(e):e)));
+  const ghXray=g.filter(Boolean).join(' ');
+  $('xrayOut').innerHTML='<div class="outreach" style="margin-top:16px">'+
+    xblock('LinkedIn — Google X-ray',liXray,true)+
+    xblock('LinkedIn — native Boolean (paste in LinkedIn search bar)',liBool,false)+
+    xblock('GitHub — Google X-ray',ghXray,true)+
+    '<div class="legend">Titles / locations / companies are OR-grouped; skills are ANDed (all required — delete some to broaden). For native GitHub search by language/location/followers, use the "Search users" tab. X-ray finds public profiles only.</div></div>';
+}
+$('runXray').onclick=runXray;
+
+const fstat=()=>$('findStatus');
+function findErr(e){const s=fstat();s.className='status err';
+  s.textContent = e.code===403 ? 'Rate/secondary limit hit — search allows ~10/min without a token. Add a token or wait.'
+    : e.code===422 ? 'Invalid search — add at least one filter.'
+    : e.code===404 ? 'Not found — check the repo/org name.'
+    : 'Something went wrong ('+(e.code||'network')+'). Try again.';}
+
+function canonLang(input){const t=(input||'').trim().toLowerCase();for(const[name,aliases]of Object.entries(LANGS)){if(name.toLowerCase()===t||aliases.includes(t))return name;}return (input||'').trim();}
+async function runSearch(){
+  const token=$('token').value.trim();
+  const parts=['type:user'];
+  const kw=$('fKeyword').value.trim(); if(kw)parts.unshift(kw);
+  const langRaw=$('fLang').value.trim(); const lang=canonLang(langRaw); if(langRaw)parts.push('language:'+lang);
+  const loc=$('fLoc').value.trim(); if(loc)parts.push('location:'+(/\s/.test(loc)?'"'+loc+'"':loc));
+  const fol=parseInt($('fFollowers').value,10); if(fol>0)parts.push('followers:>='+fol);
+  const rep=parseInt($('fRepos').value,10); if(rep>0)parts.push('repos:>='+rep);
+  const minRaw=parseInt($('fMinPct').value,10); const min=isNaN(minRaw)?40:minRaw;
+  if(parts.length===1){fstat().className='status err';fstat().textContent='Add at least one filter (language, location, followers…).';return;}
+  const q=parts.join(' ');const s=fstat();s.className='status';s.textContent='Searching GitHub…';$('findResults').innerHTML='';
+  try{
+    const d=await gh('/search/users?q='+encodeURIComponent(q)+'&per_page=30&sort=followers&order=desc',token);
+    const items=d.items||[];
+    if(!langRaw){
+      s.textContent=fmt(d.total_count||0)+' users match — showing top '+items.length+', by followers.';
+      renderResults(items.map(u=>({login:u.login,avatar:u.avatar_url,url:u.html_url,sub:'GitHub user'})));
+      return;
+    }
+    // language-depth pass
+    const enriched=[]; let hitLimit=false;
+    for(let i=0;i<items.length;i++){
+      s.textContent=`Measuring ${lang} depth… ${i+1}/${items.length}`;
+      try{
+        const repos=await gh('/users/'+items[i].login+'/repos?per_page=100&sort=pushed',token);
+        const owned=repos.filter(r=>!r.fork&&r.language);
+        const total=owned.length;
+        const match=owned.filter(r=>r.language.toLowerCase()===lang.toLowerCase()).length;
+        enriched.push({login:items[i].login,avatar:items[i].avatar_url,url:items[i].html_url,pctv:total?Math.round(match/total*100):0,match,total});
+      }catch(e){if(e.code===403){hitLimit=true;break;}}
+    }
+    const filtered=enriched.filter(x=>x.pctv>=min).sort((a,b)=>b.pctv-a.pctv);
+    s.textContent=`${filtered.length} of ${enriched.length} checked have \u2265${min}% of their public repos in ${lang}${hitLimit?' — stopped early (rate limit; add a token)':''}.`;
+    renderResults(filtered.map(x=>({login:x.login,avatar:x.avatar,url:x.url,badge:`${lang} ${x.pctv}%`,sub:`${x.match}/${x.total} public repos in ${lang}`})));
+  }catch(e){findErr(e);}
+}
+
+async function runContrib(){
+  const token=$('token').value.trim();
+  const repo=$('cRepo').value.trim().replace(/^https?:\/\/(www\.)?github\.com\//i,'').replace(/\/+$/,'');
+  const org=$('cOrg').value.trim().replace(/^@/,'').replace(/^https?:\/\/(www\.)?github\.com\//i,'').replace(/\/.*/,'');
+  const s=fstat();s.className='status';$('findResults').innerHTML='';
+  try{
+    if(repo){
+      const m=repo.split('/');
+      if(m.length<2||!m[0]||!m[1]){s.className='status err';s.textContent='Use owner/name, e.g. tokopedia/gripmock';return;}
+      s.textContent='Fetching contributors…';
+      const cs=await gh(`/repos/${m[0]}/${m[1]}/contributors?per_page=100`,token);
+      const list=cs.filter(c=>c.type!=='Bot'&&!/\[bot\]$/i.test(c.login)).map(c=>({login:c.login,avatar:c.avatar_url,url:c.html_url,contributions:c.contributions,sub:c.contributions+' commits to '+m[1]}));
+      s.textContent=list.length+' contributors to '+repo+' (ranked by commits).';
+      renderResults(list);
+    } else if(org){
+      s.textContent='Listing org repos…';
+      const repos=await gh(`/orgs/${org}/repos?per_page=100&sort=pushed`,token);
+      const top=repos.filter(r=>!r.fork).slice(0,12);
+      if(!top.length){s.className='status err';s.textContent='No public repos found for that org.';return;}
+      const agg={};
+      for(let i=0;i<top.length;i++){
+        s.textContent=`Scanning contributors… ${i+1}/${top.length} repos`;
+        const cs=await gh(`/repos/${top[i].full_name}/contributors?per_page=100`,token).catch(()=>[]);
+        cs.forEach(c=>{if(c.type==='Bot'||/\[bot\]$/i.test(c.login))return;
+          agg[c.login]=agg[c.login]||{login:c.login,avatar:c.avatar_url,url:c.html_url,contributions:0};
+          agg[c.login].contributions+=c.contributions;});
+      }
+      const list=Object.values(agg).sort((a,b)=>b.contributions-a.contributions).slice(0,60)
+        .map(x=>Object.assign(x,{sub:x.contributions+' commits across '+org}));
+      s.textContent=list.length+' contributors across '+top.length+' '+org+' repos (top 60 by commits).';
+      renderResults(list);
+    } else { s.className='status err'; s.textContent='Enter a repo (owner/name) or an org name.'; }
+  }catch(e){findErr(e);}
+}
+
+function renderResults(list){
+  const el=$('findResults');
+  if(!list.length){el.innerHTML='<div class="status">No results.</div>';return;}
+  el.innerHTML=list.map(r=>`<div class="res"><img src="${r.avatar}" alt="">
+    <div class="info"><b>@${r.login}</b>${r.badge?`<span class="contribbadge">${r.badge}</span>`:(r.contributions?`<span class="contribbadge">\u2605 ${fmt(r.contributions)}</span>`:'')}<div class="sub">${r.sub||''}</div></div>
+    <div class="acts"><button class="mini eval" data-eval="${r.login}">Evaluate</button><button class="mini" data-gh="${r.url}">GitHub \u2197</button></div></div>`).join('');
+  el.querySelectorAll('[data-eval]').forEach(b=>b.onclick=()=>evaluateFrom(b.dataset.eval));
+  el.querySelectorAll('[data-gh]').forEach(b=>b.onclick=()=>window.open(b.dataset.gh,'_blank','noopener'));
+}
+function evaluateFrom(u){ showTab('eval'); $('user').value=u; window.scrollTo({top:0,behavior:'smooth'}); run(); }
+
+$('runSearch').onclick=runSearch;
+$('runContrib').onclick=runContrib;
+$('fKeyword').addEventListener('keydown',e=>{if(e.key==='Enter')runSearch();});
+$('cRepo').addEventListener('keydown',e=>{if(e.key==='Enter')runContrib();});
+$('cOrg').addEventListener('keydown',e=>{if(e.key==='Enter')runContrib();});
+</script>
+</body>
+</html>
