@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://github-scout-three.vercel.app/sitemap.xml
