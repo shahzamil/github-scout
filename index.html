@@ -3,7 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GitHub Scout — Candidate Signal Report</title>
+<title>GitHub Recruiting Tool for Candidate Sourcing | GitHub Scout</title>
+<meta name="description" content="Find and evaluate software engineering candidates using public GitHub activity, role matching, commits, languages, and recruiter-ready signal reports.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="author" content="GitHub Scout">
+<meta name="theme-color" content="#4f46e5">
+<link rel="canonical" href="https://github-scout-three.vercel.app/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="GitHub Scout">
+<meta property="og:title" content="GitHub Scout — Find and Evaluate Software Engineers">
+<meta property="og:description" content="A free GitHub recruiting tool for finding candidates and evaluating developer profiles using public, evidence-based signals.">
+<meta property="og:url" content="https://github-scout-three.vercel.app/">
+<meta property="og:image" content="https://github-scout-three.vercel.app/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="GitHub Scout candidate sourcing and developer evaluation tool">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="GitHub Scout — Find and Evaluate Software Engineers">
+<meta name="twitter:description" content="Find candidates and evaluate developer profiles using public GitHub evidence.">
+<meta name="twitter:image" content="https://github-scout-three.vercel.app/og-image.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "GitHub Scout",
+  "url": "https://github-scout-three.vercel.app/",
+  "description": "A free GitHub recruiting tool that helps technical recruiters find software engineering candidates and evaluate public developer activity against a job description.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript and a modern web browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "GitHub candidate search",
+    "Developer profile evaluation",
+    "Job description matching",
+    "Public repository and contribution analysis",
+    "Recruiter shortlist export"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is GitHub Scout?",
+      "acceptedAnswer": {"@type": "Answer", "text": "GitHub Scout is a free recruiting tool for finding software engineering candidates and evaluating public GitHub activity against a job description."}
+    },
+    {
+      "@type": "Question",
+      "name": "What developer signals does GitHub Scout evaluate?",
+      "acceptedAnswer": {"@type": "Answer", "text": "It reviews public repositories, languages, recent activity, original work, stars, collaboration, contribution history when available, and skills relevant to a pasted job description."}
+    },
+    {
+      "@type": "Question",
+      "name": "Does GitHub Scout store my GitHub token or job description?",
+      "acceptedAnswer": {"@type": "Answer", "text": "The token, saved job description, and pasted LinkedIn text stay in the user's browser. LinkedIn text is not saved by the application."}
+    }
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -27,7 +94,7 @@
 
   .top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;
     border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:24px}
-  .brand h1{font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:-.02em;margin:0}
+  .brand .logo{font-family:var(--disp);font-weight:700;font-size:22px;letter-spacing:-.02em;margin:0}
   .brand .tag{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase;margin-top:4px}
   .brand .amber{color:var(--amber)}
   .mode{font-family:var(--mono);font-size:11px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);color:var(--faint);white-space:nowrap}
@@ -221,6 +288,28 @@
   .findnote{font-family:var(--mono);font-size:11px;color:var(--faint);line-height:1.6;margin:6px 0 10px}
   @media(max-width:640px){.findgrid{grid-template-columns:1fr 1fr}}
   .hidden{display:none}
+  .hero{background:linear-gradient(135deg,#fff 0%,#f4f5ff 100%);border:1px solid #e0e2f5;border-radius:16px;padding:24px 26px;margin-bottom:20px;box-shadow:var(--shadow)}
+  .hero h1{font-family:var(--disp);font-size:clamp(26px,4vw,40px);line-height:1.12;letter-spacing:-.035em;margin:0 0 10px;max-width:760px}
+  .hero p{color:var(--muted);font-size:15px;line-height:1.7;margin:0;max-width:780px}
+  .hero strong{color:var(--text)}
+  .seo-content{margin-top:34px}
+  .seo-content section{padding:28px}
+  .seo-content h2{font-family:var(--disp);font-size:24px;letter-spacing:-.02em;margin:0 0 12px}
+  .seo-content h3{font-family:var(--disp);font-size:16px;margin:0 0 7px}
+  .seo-content p,.seo-content li{color:var(--muted);font-size:14px;line-height:1.7}
+  .featuregrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+  .feature{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px}
+  .feature p{margin:0}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px;counter-reset:step}
+  .step{counter-increment:step}
+  .step::before{content:counter(step);display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;border-radius:50%;background:var(--amber-dim);color:var(--amber);font-family:var(--mono);font-size:12px;font-weight:700;margin-bottom:9px}
+  .step p{margin:0}
+  .faq details{border-top:1px solid var(--border);padding:14px 0}
+  .faq details:last-child{padding-bottom:0}
+  .faq summary{cursor:pointer;font-weight:600;color:var(--text)}
+  .faq details p{margin:8px 0 0}
+  footer{font-family:var(--mono);font-size:11px;color:var(--faint);text-align:center;margin-top:24px}
+  @media(max-width:720px){.featuregrid,.steps{grid-template-columns:1fr}.hero{padding:20px}.seo-content section{padding:22px}}
   @media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}.vscore{border-right:none;border-bottom:1px solid var(--border);width:100%}}
   :focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 </style>
@@ -230,11 +319,16 @@
 
   <div class="top">
     <div class="brand">
-      <h1>GitHub <span class="amber">Scout</span></h1>
+      <div class="logo">GitHub <span class="amber">Scout</span></div>
       <div class="tag">GitHub · LinkedIn · JD match · AI explore</div>
     </div>
     <div id="modeBadge" class="mode basic">Basic mode — no token</div>
   </div>
+
+  <header class="hero">
+    <h1>Find and evaluate software engineers on GitHub</h1>
+    <p><strong>GitHub Scout</strong> is a free GitHub recruiting tool for technical recruiters and hiring teams. Search for developer candidates, assess public coding evidence, compare profiles with a job description, and build an evidence-based shortlist.</p>
+  </header>
 
   <div class="tabs">
     <button class="tab active" id="tabEval">Evaluate</button>
@@ -333,7 +427,55 @@
     </div>
     <div id="shortList"></div>
   </div>
+
+  <main class="seo-content">
+    <section aria-labelledby="what-is-scout">
+      <h2 id="what-is-scout">Candidate sourcing based on public engineering evidence</h2>
+      <p>Resumes and LinkedIn profiles show what a candidate says they can do. GitHub Scout adds another layer: what their public code, repositories, contributions, languages, and collaboration history demonstrate. Use it as a focused research assistant during technical sourcing—not as a replacement for interviews or human judgment.</p>
+      <div class="featuregrid">
+        <article class="feature">
+          <h3>Find developer candidates</h3>
+          <p>Search GitHub users by language, location, public repositories, followers, and profile keywords, or explore contributors to a repository or organization.</p>
+        </article>
+        <article class="feature">
+          <h3>Evaluate GitHub profiles</h3>
+          <p>Review activity, original repositories, language depth, collaboration, project traction, skills, recency, and other visible technical signals.</p>
+        </article>
+        <article class="feature">
+          <h3>Match candidates to a role</h3>
+          <p>Paste a job description to separate skills proven in public code from skills claimed in supplied profile text and gaps that need interview validation.</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="how-it-works">
+      <h2 id="how-it-works">How GitHub Scout works</h2>
+      <div class="steps">
+        <article class="step"><h3>Search or enter a username</h3><p>Find relevant developers or paste a known GitHub username into the evaluator.</p></article>
+        <article class="step"><h3>Add role context</h3><p>Optionally paste the job description and candidate profile text for a role-specific comparison.</p></article>
+        <article class="step"><h3>Review the evidence</h3><p>Use the report, caveats, and shortlist tools to decide who deserves deeper human review.</p></article>
+      </div>
+    </section>
+
+    <section aria-labelledby="responsible-use">
+      <h2 id="responsible-use">Designed for responsible technical recruiting</h2>
+      <p>Public GitHub activity is incomplete by nature. Many excellent engineers work mainly in private repositories, use different accounts, or contribute outside GitHub. Treat a thin public profile as missing evidence—not proof of weak ability. Validate every hiring decision through structured interviews, work samples, references, and role-relevant assessment.</p>
+    </section>
+
+    <section class="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">Frequently asked questions</h2>
+      <details><summary>What is GitHub Scout?</summary><p>GitHub Scout is a free candidate sourcing and developer profile evaluation tool. It helps recruiters interpret public GitHub signals and compare them with a job description.</p></details>
+      <details><summary>What signals does it evaluate?</summary><p>Depending on the available public data and mode, GitHub Scout reviews repositories, languages, recent activity, original work, stars, collaboration, contribution history, and role-relevant skills.</p></details>
+      <details><summary>Does a low score mean someone is a weak engineer?</summary><p>No. The score summarizes visible public evidence only. Private work, company code, offline projects, and unlisted experience are not observable and must not be treated as negative evidence.</p></details>
+      <details><summary>Is my GitHub token stored on a server?</summary><p>No. The token, saved job description, and pasted text stay in your browser. Only enable “remember token” on a device you trust.</p></details>
+      <details><summary>Is this an official GitHub product?</summary><p>No. GitHub Scout is an independent recruiting tool and is not affiliated with or endorsed by GitHub.</p></details>
+    </section>
+  </main>
+
+  <footer>GitHub Scout · Public evidence is context, not a hiring decision.</footer>
 </div>
+
+<noscript><p style="max-width:760px;margin:40px auto;padding:20px;font-family:system-ui">GitHub Scout requires JavaScript to search for and evaluate developer candidates.</p></noscript>
 
 <script>
 const $ = id => document.getElementById(id);
