@@ -309,6 +309,8 @@
   .faq summary{cursor:pointer;font-weight:600;color:var(--text)}
   .faq details p{margin:8px 0 0}
   footer{font-family:var(--mono);font-size:11px;color:var(--faint);text-align:center;margin-top:24px}
+  .visitor-count{display:inline-flex;align-items:center;gap:6px;margin-left:8px;color:var(--amber)}
+  .visitor-count[hidden]{display:none}
   @media(max-width:720px){.featuregrid,.steps{grid-template-columns:1fr}.hero{padding:20px}.seo-content section{padding:22px}}
   @media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}.vscore{border-right:none;border-bottom:1px solid var(--border);width:100%}}
   :focus-visible{outline:2px solid var(--amber);outline-offset:2px}
@@ -688,7 +690,10 @@
     </section>
   </main>
 
-  <footer>GitHub Scout · Public evidence is context, not a hiring decision.</footer>
+  <footer>
+    GitHub Scout · Public evidence is context, not a hiring decision.
+    <span class="visitor-count" id="visitorCount" hidden>· <span id="visitorCountValue">0</span> anonymous visitors</span>
+  </footer>
   </div>
 </div>
 
@@ -698,12 +703,67 @@
 const $ = id => document.getElementById(id);
 const status = $('status'), report = $('report');
 
+/* ---------- privacy-safe anonymous analytics ----------
+   Records product usage only. Never send tokens, usernames, search filters,
+   job descriptions, LinkedIn text, shortlist data, or candidate information. */
+const ANALYTICS_URL='https://welgeoyeurirwujlowle.supabase.co';
+const ANALYTICS_KEY='sb_publishable_jU_058tObbl9KzXA0BXXqw_WogEzgUV';
+const ANALYTICS_EVENTS=new Set(['page_view','deep_mode_enabled','candidate_scan','candidate_search','contributor_search','xray_build','shortlist_save','report_print']);
+
+function analyticsUuid(){
+  if(globalThis.crypto&&typeof globalThis.crypto.randomUUID==='function')return globalThis.crypto.randomUUID();
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16);});
+}
+function analyticsBrowser(){
+  const u=navigator.userAgent;
+  if(/Edg\//.test(u))return'Edge';if(/OPR\//.test(u))return'Opera';if(/Chrome\//.test(u))return'Chrome';
+  if(/Firefox\//.test(u))return'Firefox';if(/Safari\//.test(u))return'Safari';return'Other';
+}
+function analyticsOs(){
+  const u=navigator.userAgent;
+  if(/Windows/.test(u))return'Windows';if(/Android/.test(u))return'Android';
+  if(/iPhone|iPad|iPod/.test(u))return'iOS';if(/Mac OS X/.test(u))return'macOS';
+  if(/Linux/.test(u))return'Linux';return'Other';
+}
+function analyticsDevice(){
+  const u=navigator.userAgent;
+  if(/iPad|Tablet/i.test(u))return'tablet';if(/Mobi|Android|iPhone|iPod/i.test(u))return'mobile';return'desktop';
+}
+function analyticsIdentity(){
+  let visitorId=lsGet('scout_visitor_id');
+  const returning=!!visitorId;
+  if(!visitorId){visitorId=analyticsUuid();lsSet('scout_visitor_id',visitorId);}
+  let sessionId;try{sessionId=sessionStorage.getItem('scout_session_id');if(!sessionId){sessionId=analyticsUuid();sessionStorage.setItem('scout_session_id',sessionId);}}catch(e){sessionId=analyticsUuid();}
+  return{visitorId,sessionId,returning};
+}
+async function trackEvent(eventName){
+  if(!ANALYTICS_EVENTS.has(eventName)||location.protocol==='file:')return;
+  const identity=analyticsIdentity();
+  let referrer='';try{referrer=document.referrer?new URL(document.referrer).hostname.slice(0,160):'';}catch(e){}
+  const payload={
+    visitor_id:identity.visitorId,session_id:identity.sessionId,is_returning:identity.returning,
+    event_name:eventName,path:location.pathname.slice(0,200)||'/',referrer_host:referrer,
+    device_type:analyticsDevice(),browser:analyticsBrowser(),operating_system:analyticsOs(),
+    language:(navigator.language||'').slice(0,20),timezone:(Intl.DateTimeFormat().resolvedOptions().timeZone||'').slice(0,60),
+    screen_width:Math.round(screen.width||0),screen_height:Math.round(screen.height||0)
+  };
+  try{await fetch(ANALYTICS_URL+'/rest/v1/visitor_events',{method:'POST',keepalive:true,headers:{apikey:ANALYTICS_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});}catch(e){}
+}
+async function loadVisitorCount(){
+  try{
+    const r=await fetch(ANALYTICS_URL+'/rest/v1/rpc/get_public_visitor_count',{method:'POST',headers:{apikey:ANALYTICS_KEY,'Content-Type':'application/json'},body:'{}'});
+    if(!r.ok)return;const count=await r.json();
+    $('visitorCountValue').textContent=Number(count||0).toLocaleString();$('visitorCount').hidden=false;
+  }catch(e){}
+}
+
 /* ---------- persistence (works on deployed site / local file; no-op in sandbox) ---------- */
 function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
 function lsDel(k){try{localStorage.removeItem(k);}catch(e){}}
 
 document.addEventListener('DOMContentLoaded',()=>{
+  trackEvent('page_view');loadVisitorCount();
   const savedJd=lsGet('scout_jd'); if(savedJd){$('jd').value=savedJd;$('roleBox').open=true;$('jdSaved').textContent='· saved ✓';}
   const rem=lsGet('scout_remember')==='1';
   if(rem){$('remtoken').checked=true; const t=lsGet('scout_token'); if(t){$('token').value=t; syncMode();}}
@@ -785,7 +845,8 @@ function scoreColor(v){if(v>=7.5)return'var(--green)';if(v>=5)return'var(--yello
 function pctColor(v){if(v>=75)return'var(--green)';if(v>=50)return'var(--yellow)';if(v>=30)return'var(--orange)';return'var(--red)';}
 
 function syncMode(){const has=$('token').value.trim();const b=$('modeBadge');b.className='mode '+(has?'deep':'basic');b.textContent=has?'Deep mode — token active':'Basic mode — no token';}
-$('token').addEventListener('input',()=>{syncMode();if($('remtoken').checked)lsSet('scout_token',$('token').value.trim());});
+let deepModeTracked=false;
+$('token').addEventListener('input',()=>{syncMode();if($('remtoken').checked)lsSet('scout_token',$('token').value.trim());if(!deepModeTracked&&$('token').value.trim()){deepModeTracked=true;trackEvent('deep_mode_enabled');}});
 $('go').onclick=run;
 $('user').addEventListener('keydown',e=>{if(e.key==='Enter')run();});
 
@@ -793,6 +854,7 @@ async function run(){
   const u=$('user').value.trim().replace(/^@/,'').replace(/.*github\.com\//,'').replace(/\/.*/,'');
   const token=$('token').value.trim(), linkedin=$('linkedin').value.trim(), jd=$('jd').value.trim();
   if(!u){status.textContent='Enter a username.';return;}
+  trackEvent('candidate_scan');
   report.classList.add('hidden');status.className='status';status.textContent='Fetching profile…';$('go').disabled=true;
   try{
     const profile=await gh('/users/'+encodeURIComponent(u),token);
@@ -1289,10 +1351,10 @@ function scoutSaveShortlist(btn){
   const list=getShort();const login=a.profile.login;
   if(list.some(x=>x.login.toLowerCase()===login.toLowerCase())){btn.textContent='Already saved ✓';setTimeout(()=>btn.textContent='+ Save to shortlist',1500);return;}
   list.push({login,name:a.profile.name||login,score:a.score,jdPct:a.jdMatch?a.jdMatch.matchPct:null,lean:a.lean,level:a.level,url:a.profile.html_url,status:'Sourced',note:'',ts:Date.now()});
-  setShort(list);btn.textContent='Saved ✓';setTimeout(()=>btn.textContent='+ Save to shortlist',1500);
+  setShort(list);trackEvent('shortlist_save');btn.textContent='Saved ✓';setTimeout(()=>btn.textContent='+ Save to shortlist',1500);
 }
 function scoutCopySummary(btn){const t=window.__scoutSummary||'';navigator.clipboard.writeText(t).then(()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1500);}).catch(()=>{});}
-function scoutPrint(){window.print();}
+function scoutPrint(){trackEvent('report_print');window.print();}
 function renderShortlist(){
   const list=getShort().sort((a,b)=>b.score-a.score);
   $('shortMeta').textContent=list.length?list.length+' candidates saved · sorted by score':'';
@@ -1350,6 +1412,7 @@ function runXray(){
   const titles=xTerms($('xTitle').value),skills=xTerms($('xSkills').value),locs=xTerms($('xLoc').value),comps=xTerms($('xCompany').value),excl=xTerms($('xExclude').value);
   ['xTitle','xSkills','xLoc','xCompany','xExclude'].forEach(id=>lsSet('scout_'+id,$(id).value));
   if(!titles.length&&!skills.length&&!locs.length){$('xrayOut').innerHTML='<div class="status err" style="padding:10px 0">Add at least a title, skill, or location.</div>';return;}
+  trackEvent('xray_build');
   let li=['site:linkedin.com/in'];
   if(titles.length)li.push(xor(titles));
   skills.forEach(s=>li.push(xq(s)));
@@ -1397,6 +1460,7 @@ async function runSearch(){
   const rep=parseInt($('fRepos').value,10); if(rep>0)parts.push('repos:>='+rep);
   const minRaw=parseInt($('fMinPct').value,10); const min=isNaN(minRaw)?40:minRaw;
   if(parts.length===1){fstat().className='status err';fstat().textContent='Add at least one filter (language, location, followers…).';return;}
+  trackEvent('candidate_search');
   const q=parts.join(' ');const s=fstat();s.className='status';s.textContent='Searching GitHub…';$('findResults').innerHTML='';
   try{
     const d=await gh('/search/users?q='+encodeURIComponent(q)+'&per_page=30&sort=followers&order=desc',token);
@@ -1433,12 +1497,14 @@ async function runContrib(){
     if(repo){
       const m=repo.split('/');
       if(m.length<2||!m[0]||!m[1]){s.className='status err';s.textContent='Use owner/name, e.g. tokopedia/gripmock';return;}
+      trackEvent('contributor_search');
       s.textContent='Fetching contributors…';
       const cs=await gh(`/repos/${m[0]}/${m[1]}/contributors?per_page=100`,token);
       const list=cs.filter(c=>c.type!=='Bot'&&!/\[bot\]$/i.test(c.login)).map(c=>({login:c.login,avatar:c.avatar_url,url:c.html_url,contributions:c.contributions,sub:c.contributions+' commits to '+m[1]}));
       s.textContent=list.length+' contributors to '+repo+' (ranked by commits).';
       renderResults(list);
     } else if(org){
+      trackEvent('contributor_search');
       s.textContent='Listing org repos…';
       const repos=await gh(`/orgs/${org}/repos?per_page=100&sort=pushed`,token);
       const top=repos.filter(r=>!r.fork).slice(0,12);
