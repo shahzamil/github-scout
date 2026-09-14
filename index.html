@@ -311,6 +311,35 @@
   footer{font-family:var(--mono);font-size:11px;color:var(--faint);text-align:center;margin-top:24px}
   .visitor-count{display:inline-flex;align-items:center;gap:6px;margin-left:8px;color:var(--amber)}
   .visitor-count[hidden]{display:none}
+  .account-btn{width:100%;border:1px solid #42484d;background:#202428;color:#f5f6f2;padding:10px 12px;font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.06em;cursor:pointer}
+  .account-btn:hover{border-color:#c7ff3e;color:#c7ff3e}
+  .account-modal{position:fixed;inset:0;z-index:1000;background:rgba(8,10,12,.78);display:grid;place-items:center;padding:20px}
+  .account-modal.hidden{display:none}
+  .account-card{width:min(720px,100%);max-height:90vh;overflow:auto;background:#f6f4ed;color:#171a1d;border:1px solid #171a1d;box-shadow:12px 12px 0 #9a82ff;padding:28px;position:relative}
+  .account-close{position:absolute;right:18px;top:16px;border:0;background:transparent;font-size:28px;cursor:pointer;color:#171a1d}
+  .account-kicker{font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:#6b7074}
+  .account-card h2{font:700 34px var(--disp);margin:8px 42px 8px 0;line-height:1.05}
+  .account-copy{color:#5e6367;margin:0 0 20px}
+  .account-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .account-card input,.account-card select{width:100%;border:1px solid #c8cbc7;background:#fff;padding:12px;font:14px var(--body);outline:none}
+  .account-card input:focus{border-color:#171a1d}
+  .account-action{border:0;background:#171a1d;color:#fff;padding:12px 18px;font:700 12px var(--mono);text-transform:uppercase;cursor:pointer}
+  .account-action.alt{background:#c7ff3e;color:#171a1d}
+  .account-link{border:0;background:transparent;color:#5b3fe5;text-decoration:underline;cursor:pointer;padding:8px 0;font:600 12px var(--body)}
+  .account-status{font:12px var(--mono);min-height:22px;margin-top:10px;color:#5e6367}
+  .account-status.err{color:#c52d2d}
+  .account-section{border-top:1px solid #d6d6cf;margin-top:22px;padding-top:20px}
+  .account-section h3{font:700 20px var(--disp);margin:0 0 12px}
+  .account-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .account-row input{flex:1;min-width:220px}
+  .account-list{display:grid;gap:8px;margin-top:12px}
+  .account-item{background:#fff;border:1px solid #d6d6cf;padding:12px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+  .account-item b{font:700 14px var(--disp)}
+  .account-item small{display:block;color:#73777b;margin-top:3px}
+  .admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px}
+  .admin-stat{background:#171a1d;color:#fff;padding:14px}.admin-stat b{font:700 24px var(--disp);display:block}.admin-stat span{font:10px var(--mono);color:#b8bdc0;text-transform:uppercase}
+  .privacy-note{font-size:12px;color:#686d70;background:#ebe9e1;padding:12px;margin-top:18px}
+  @media(max-width:640px){.account-grid{grid-template-columns:1fr}.admin-stats{grid-template-columns:1fr}.account-card{padding:22px}}
   @media(max-width:720px){.featuregrid,.steps{grid-template-columns:1fr}.hero{padding:20px}.seo-content section{padding:22px}}
   @media(max-width:720px){.grid{grid-template-columns:repeat(2,1fr)}.vscore{border-right:none;border-bottom:1px solid var(--border);width:100%}}
   :focus-visible{outline:2px solid var(--amber);outline-offset:2px}
@@ -517,6 +546,7 @@
     </nav>
     <div class="side-note"><div class="side-label">Evidence standard</div><p>Public activity is context, not a hiring decision. Missing evidence stays missing.</p></div>
     <div id="modeBadge" class="mode basic">Basic mode — no token</div>
+    <button class="account-btn" id="accountBtn">Create account / Sign in</button>
   </header>
 
   <div class="workspace">
@@ -697,8 +727,65 @@
   </div>
 </div>
 
+<div class="account-modal hidden" id="accountModal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+  <div class="account-card">
+    <button class="account-close" id="accountClose" aria-label="Close account window">×</button>
+    <div class="account-kicker">GitHub Scout account</div>
+    <div id="authView">
+      <h2 id="accountTitle">Save your recruiting workspace</h2>
+      <p class="account-copy">Create an account to sync projects, candidate reports, shortlists and notes across devices.</p>
+      <div class="account-grid" id="signupFields">
+        <input id="authName" autocomplete="name" placeholder="Full name">
+        <input id="authCompany" autocomplete="organization" placeholder="Company">
+      </div>
+      <div class="account-grid" style="margin-top:12px">
+        <input id="authEmail" type="email" autocomplete="email" placeholder="Work email">
+        <input id="authPassword" type="password" autocomplete="current-password" placeholder="Password, minimum 8 characters">
+      </div>
+      <div class="account-row" style="margin-top:14px">
+        <button class="account-action" id="authSubmit">Create account</button>
+        <button class="account-link" id="authToggle">Already registered? Sign in</button>
+      </div>
+      <div class="account-status" id="authStatus"></div>
+    </div>
+
+    <div id="memberView" class="hidden">
+      <h2>Recruiter workspace</h2>
+      <p class="account-copy" id="memberIdentity"></p>
+      <div class="account-row">
+        <button class="account-action" id="syncNow">Sync shortlist now</button>
+        <button class="account-link" id="authLogout">Sign out</button>
+      </div>
+      <div class="account-status" id="memberStatus"></div>
+
+      <section class="account-section">
+        <h3>Hiring projects</h3>
+        <p class="account-copy">Save the job description currently entered in GitHub Scout as a private hiring project.</p>
+        <div class="account-row">
+          <input id="projectTitle" placeholder="Project title, e.g. Senior Go Engineer">
+          <button class="account-action alt" id="saveProject">Save current JD</button>
+        </div>
+        <div class="account-list" id="projectList"></div>
+      </section>
+
+      <section class="account-section hidden" id="adminSection">
+        <h3>Owner dashboard</h3>
+        <div class="admin-stats" id="adminStats"></div>
+        <h3 style="margin-top:18px">Registered users</h3>
+        <div class="account-list" id="adminUsers"></div>
+        <h3 style="margin-top:18px">Recent activity</h3>
+        <div class="account-list" id="adminEvents"></div>
+      </section>
+    </div>
+
+    <div class="privacy-note">Passwords are handled by Supabase and are never visible to GitHub Scout. GitHub access tokens remain in this browser and are never uploaded. Account data, projects and saved candidate records are private to each user. The owner can view account and product-usage records for administration.</div>
+  </div>
+</div>
+
 <noscript><p style="max-width:760px;margin:40px auto;padding:20px;font-family:system-ui">GitHub Scout requires JavaScript to search for and evaluate developer candidates.</p></noscript>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/backend.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 const status = $('status'), report = $('report');
@@ -708,7 +795,7 @@ const status = $('status'), report = $('report');
    job descriptions, LinkedIn text, shortlist data, or candidate information. */
 const ANALYTICS_URL='https://welgeoyeurirwujlowle.supabase.co';
 const ANALYTICS_KEY='sb_publishable_jU_058tObbl9KzXA0BXXqw_WogEzgUV';
-const ANALYTICS_EVENTS=new Set(['page_view','deep_mode_enabled','candidate_scan','candidate_search','contributor_search','xray_build','shortlist_save','report_print']);
+const ANALYTICS_EVENTS=new Set(['page_view','deep_mode_enabled','candidate_scan','candidate_search','contributor_search','xray_build','shortlist_save','report_print','account_signup','account_login','project_save','shortlist_sync']);
 
 function analyticsUuid(){
   if(globalThis.crypto&&typeof globalThis.crypto.randomUUID==='function')return globalThis.crypto.randomUUID();
@@ -747,7 +834,10 @@ async function trackEvent(eventName){
     language:(navigator.language||'').slice(0,20),timezone:(Intl.DateTimeFormat().resolvedOptions().timeZone||'').slice(0,60),
     screen_width:Math.round(screen.width||0),screen_height:Math.round(screen.height||0)
   };
-  try{await fetch(ANALYTICS_URL+'/rest/v1/visitor_events',{method:'POST',keepalive:true,headers:{apikey:ANALYTICS_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload)});}catch(e){}
+  const headers={apikey:ANALYTICS_KEY,'Content-Type':'application/json',Prefer:'return=minimal'};
+  const accessToken=window.scoutBackend&&window.scoutBackend.getAccessToken?window.scoutBackend.getAccessToken():'';
+  if(accessToken)headers.Authorization='Bearer '+accessToken;
+  try{await fetch(ANALYTICS_URL+'/rest/v1/visitor_events',{method:'POST',keepalive:true,headers,body:JSON.stringify(payload)});}catch(e){}
 }
 async function loadVisitorCount(){
   try{
@@ -1344,7 +1434,7 @@ $('tabShort').onclick=()=>showTab('short');
 
 const STATUSES=['Sourced','To interview','Interviewing','Offer','Hired','Passed'];
 function getShort(){try{return JSON.parse(lsGet('scout_shortlist')||'[]');}catch(e){return [];}}
-function setShort(a){lsSet('scout_shortlist',JSON.stringify(a));updateShortCount();}
+function setShort(a){lsSet('scout_shortlist',JSON.stringify(a));updateShortCount();if(window.scoutBackend&&window.scoutBackend.syncShortlist)window.scoutBackend.syncShortlist(a);}
 function updateShortCount(){const el=$('shortCount');if(el){const n=getShort().length;el.textContent=n?String(n):'';}}
 function scoutSaveShortlist(btn){
   const a=window.__scoutA;if(!a)return;

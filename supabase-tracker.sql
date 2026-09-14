@@ -26,7 +26,11 @@ create table if not exists public.visitor_events (
       'contributor_search',
       'xray_build',
       'shortlist_save',
-      'report_print'
+      'report_print',
+      'account_signup',
+      'account_login',
+      'project_save',
+      'shortlist_sync'
     )
   ),
   constraint visitor_events_path_length_check check (char_length(path) between 1 and 200),
@@ -63,7 +67,11 @@ create policy "anonymous analytics insert"
       'contributor_search',
       'xray_build',
       'shortlist_save',
-      'report_print'
+      'report_print',
+      'account_signup',
+      'account_login',
+      'project_save',
+      'shortlist_sync'
     )
     and char_length(path) between 1 and 200
     and char_length(referrer_host) <= 160
