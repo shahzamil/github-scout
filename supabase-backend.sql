@@ -20,6 +20,7 @@ create table if not exists public.profiles (
   full_name text not null default '',
   company text not null default '',
   recruiter_role text not null default '',
+  auth_provider text not null default 'email',
   created_at timestamptz not null default now(),
   last_seen_at timestamptz not null default now()
 );
@@ -54,12 +55,15 @@ create table if not exists public.saved_candidates (
 alter table public.visitor_events
   add column if not exists user_id uuid references auth.users(id) on delete set null default auth.uid();
 
+alter table public.profiles
+  add column if not exists auth_provider text not null default 'email';
+
 alter table public.visitor_events drop constraint if exists visitor_events_event_name_check;
 alter table public.visitor_events add constraint visitor_events_event_name_check check (
   event_name in (
     'page_view','deep_mode_enabled','candidate_scan','candidate_search',
     'contributor_search','xray_build','shortlist_save','report_print',
-    'account_signup','account_login','project_save','shortlist_sync'
+    'account_signup','account_login','account_google','project_save','shortlist_sync'
   )
 );
 
@@ -99,7 +103,7 @@ drop policy if exists "anonymous analytics insert" on public.visitor_events;
 create policy "anonymous analytics insert" on public.visitor_events for insert to anon, authenticated
   with check (
     (user_id is null or user_id = auth.uid())
-    and event_name in ('page_view','deep_mode_enabled','candidate_scan','candidate_search','contributor_search','xray_build','shortlist_save','report_print','account_signup','account_login','project_save','shortlist_sync')
+    and event_name in ('page_view','deep_mode_enabled','candidate_scan','candidate_search','contributor_search','xray_build','shortlist_save','report_print','account_signup','account_login','account_google','project_save','shortlist_sync')
     and char_length(path) between 1 and 200
     and char_length(referrer_host) <= 160
     and device_type in ('desktop','mobile','tablet','other')
@@ -118,17 +122,19 @@ security definer
 set search_path = ''
 as $$
 begin
-  insert into public.profiles (id,email,full_name,company)
+  insert into public.profiles (id,email,full_name,company,auth_provider)
   values (
     new.id,
     new.email,
-    coalesce(new.raw_user_meta_data ->> 'full_name',''),
-    coalesce(new.raw_user_meta_data ->> 'company','')
+    coalesce(new.raw_user_meta_data ->> 'full_name',new.raw_user_meta_data ->> 'name',''),
+    coalesce(new.raw_user_meta_data ->> 'company',''),
+    coalesce(new.raw_app_meta_data ->> 'provider','email')
   )
   on conflict (id) do update set
     email = excluded.email,
     full_name = excluded.full_name,
     company = excluded.company,
+    auth_provider = excluded.auth_provider,
     last_seen_at = now();
   return new;
 end;
@@ -140,8 +146,8 @@ create trigger on_scout_user_created
   for each row execute procedure public.handle_scout_user_signup();
 
 -- Backfill the owner or any users created before this script ran.
-insert into public.profiles (id,email,full_name,company)
-select id,email,coalesce(raw_user_meta_data ->> 'full_name',''),coalesce(raw_user_meta_data ->> 'company','')
+insert into public.profiles (id,email,full_name,company,auth_provider)
+select id,email,coalesce(raw_user_meta_data ->> 'full_name',raw_user_meta_data ->> 'name',''),coalesce(raw_user_meta_data ->> 'company',''),coalesce(raw_app_meta_data ->> 'provider','email')
 from auth.users
 on conflict (id) do nothing;
 

@@ -325,6 +325,9 @@
   .account-card input:focus{border-color:#171a1d}
   .account-action{border:0;background:#171a1d;color:#fff;padding:12px 18px;font:700 12px var(--mono);text-transform:uppercase;cursor:pointer}
   .account-action.alt{background:#c7ff3e;color:#171a1d}
+  .google-login{width:100%;border:1px solid #c8cbc7;background:#fff;color:#171a1d;padding:13px 18px;font:700 14px var(--body);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px}
+  .google-login:hover{border-color:#171a1d}.google-mark{font:700 18px var(--body);color:#4285f4}
+  .auth-divider{display:flex;align-items:center;gap:12px;color:#8a8e91;font:11px var(--mono);text-transform:uppercase;margin:4px 0 16px}.auth-divider:before,.auth-divider:after{content:'';height:1px;background:#d6d6cf;flex:1}
   .account-link{border:0;background:transparent;color:#5b3fe5;text-decoration:underline;cursor:pointer;padding:8px 0;font:600 12px var(--body)}
   .account-status{font:12px var(--mono);min-height:22px;margin-top:10px;color:#5e6367}
   .account-status.err{color:#c52d2d}
@@ -734,6 +737,8 @@
     <div id="authView">
       <h2 id="accountTitle">Save your recruiting workspace</h2>
       <p class="account-copy">Create an account to sync projects, candidate reports, shortlists and notes across devices.</p>
+      <button class="google-login" id="googleLogin"><span class="google-mark">G</span> Continue with Google</button>
+      <div class="auth-divider">or use email</div>
       <div class="account-grid" id="signupFields">
         <input id="authName" autocomplete="name" placeholder="Full name">
         <input id="authCompany" autocomplete="organization" placeholder="Company">
@@ -789,13 +794,18 @@
 <script>
 const $ = id => document.getElementById(id);
 const status = $('status'), report = $('report');
+function requireScoutAccount(message){
+  if(window.scoutBackend&&window.scoutBackend.requireAuth)return window.scoutBackend.requireAuth(message);
+  alert('The account service could not load. Refresh the page and try again.');
+  return false;
+}
 
 /* ---------- privacy-safe anonymous analytics ----------
    Records product usage only. Never send tokens, usernames, search filters,
    job descriptions, LinkedIn text, shortlist data, or candidate information. */
 const ANALYTICS_URL='https://welgeoyeurirwujlowle.supabase.co';
 const ANALYTICS_KEY='sb_publishable_jU_058tObbl9KzXA0BXXqw_WogEzgUV';
-const ANALYTICS_EVENTS=new Set(['page_view','deep_mode_enabled','candidate_scan','candidate_search','contributor_search','xray_build','shortlist_save','report_print','account_signup','account_login','project_save','shortlist_sync']);
+const ANALYTICS_EVENTS=new Set(['page_view','deep_mode_enabled','candidate_scan','candidate_search','contributor_search','xray_build','shortlist_save','report_print','account_signup','account_login','account_google','project_save','shortlist_sync']);
 
 function analyticsUuid(){
   if(globalThis.crypto&&typeof globalThis.crypto.randomUUID==='function')return globalThis.crypto.randomUUID();
@@ -941,6 +951,7 @@ $('go').onclick=run;
 $('user').addEventListener('keydown',e=>{if(e.key==='Enter')run();});
 
 async function run(){
+  if(!requireScoutAccount('Sign in with Google or email to scan a GitHub profile.'))return;
   const u=$('user').value.trim().replace(/^@/,'').replace(/.*github\.com\//,'').replace(/\/.*/,'');
   const token=$('token').value.trim(), linkedin=$('linkedin').value.trim(), jd=$('jd').value.trim();
   if(!u){status.textContent='Enter a username.';return;}
@@ -1437,6 +1448,7 @@ function getShort(){try{return JSON.parse(lsGet('scout_shortlist')||'[]');}catch
 function setShort(a){lsSet('scout_shortlist',JSON.stringify(a));updateShortCount();if(window.scoutBackend&&window.scoutBackend.syncShortlist)window.scoutBackend.syncShortlist(a);}
 function updateShortCount(){const el=$('shortCount');if(el){const n=getShort().length;el.textContent=n?String(n):'';}}
 function scoutSaveShortlist(btn){
+  if(!requireScoutAccount('Sign in to save and synchronize a candidate shortlist.'))return;
   const a=window.__scoutA;if(!a)return;
   const list=getShort();const login=a.profile.login;
   if(list.some(x=>x.login.toLowerCase()===login.toLowerCase())){btn.textContent='Already saved ✓';setTimeout(()=>btn.textContent='+ Save to shortlist',1500);return;}
@@ -1499,6 +1511,7 @@ function xblock(title,val,g){
 function xcopy(b){navigator.clipboard.writeText(b.dataset.v).then(()=>{const o=b.textContent;b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1500);}).catch(()=>{});}
 function xrunGoogle(b){window.open('https://www.google.com/search?q='+encodeURIComponent(b.dataset.q),'_blank','noopener');}
 function runXray(){
+  if(!requireScoutAccount('Sign in with Google or email to build sourcing searches.'))return;
   const titles=xTerms($('xTitle').value),skills=xTerms($('xSkills').value),locs=xTerms($('xLoc').value),comps=xTerms($('xCompany').value),excl=xTerms($('xExclude').value);
   ['xTitle','xSkills','xLoc','xCompany','xExclude'].forEach(id=>lsSet('scout_'+id,$(id).value));
   if(!titles.length&&!skills.length&&!locs.length){$('xrayOut').innerHTML='<div class="status err" style="padding:10px 0">Add at least a title, skill, or location.</div>';return;}
@@ -1541,6 +1554,7 @@ function findErr(e){const s=fstat();s.className='status err';
 
 function canonLang(input){const t=(input||'').trim().toLowerCase();for(const[name,aliases]of Object.entries(LANGS)){if(name.toLowerCase()===t||aliases.includes(t))return name;}return (input||'').trim();}
 async function runSearch(){
+  if(!requireScoutAccount('Sign in with Google or email to search for candidates.'))return;
   const token=$('token').value.trim();
   const parts=['type:user'];
   const kw=$('fKeyword').value.trim(); if(kw)parts.unshift(kw);
@@ -1579,6 +1593,7 @@ async function runSearch(){
 }
 
 async function runContrib(){
+  if(!requireScoutAccount('Sign in with Google or email to search repository contributors.'))return;
   const token=$('token').value.trim();
   const repo=$('cRepo').value.trim().replace(/^https?:\/\/(www\.)?github\.com\//i,'').replace(/\/+$/,'');
   const org=$('cOrg').value.trim().replace(/^@/,'').replace(/^https?:\/\/(www\.)?github\.com\//i,'').replace(/\/.*/,'');

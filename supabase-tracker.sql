@@ -29,6 +29,7 @@ create table if not exists public.visitor_events (
       'report_print',
       'account_signup',
       'account_login',
+      'account_google',
       'project_save',
       'shortlist_sync'
     )
@@ -70,6 +71,7 @@ create policy "anonymous analytics insert"
       'report_print',
       'account_signup',
       'account_login',
+      'account_google',
       'project_save',
       'shortlist_sync'
     )

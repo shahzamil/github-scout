@@ -17,6 +17,7 @@
   function setStatus(id,message,error=false){const el=byId(id);if(!el)return;el.textContent=message||'';el.classList.toggle('err',!!error);}
   function openModal(){byId('accountModal').classList.remove('hidden');}
   function closeModal(){byId('accountModal').classList.add('hidden');}
+  function requireAuth(message){if(session&&session.user)return true;openModal();setStatus('authStatus',message||'Sign in to continue.');return false;}
 
   function renderAuth(){
     const loggedIn=!!(session&&session.user);
@@ -61,6 +62,13 @@
       }
     }catch(error){setStatus('authStatus',error.message||'Account request failed. Please try again.',true);}
     finally{byId('authSubmit').disabled=false;}
+  }
+
+  async function signInWithGoogle(){
+    setStatus('authStatus','Opening Google sign in…');
+    productEvent('account_google');
+    const {error}=await client.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});
+    if(error)setStatus('authStatus',error.message||'Google sign in could not start.',true);
   }
 
   async function touchProfile(){
@@ -131,7 +139,7 @@
   async function loadAdmin(){
     if(!isAdmin())return;
     const [profiles,candidates,projects,eventCount,recentEvents]=await Promise.all([
-      client.from('profiles').select('id,email,full_name,company,created_at,last_seen_at').order('created_at',{ascending:false}).limit(100),
+      client.from('profiles').select('id,email,full_name,company,auth_provider,created_at,last_seen_at').order('created_at',{ascending:false}).limit(100),
       client.from('saved_candidates').select('id',{count:'exact',head:true}),
       client.from('projects').select('id',{count:'exact',head:true}),
       client.from('visitor_events').select('id',{count:'exact',head:true}),
@@ -139,7 +147,7 @@
     ]);
     if(profiles.error||recentEvents.error)return setStatus('memberStatus','Admin data could not be loaded: '+(profiles.error||recentEvents.error).message,true);
     byId('adminStats').innerHTML='<div class="admin-stat"><b>'+profiles.data.length+'</b><span>accounts</span></div><div class="admin-stat"><b>'+(projects.count||0)+'</b><span>projects</span></div><div class="admin-stat"><b>'+(candidates.count||0)+'</b><span>saved candidates</span></div><div class="admin-stat"><b>'+(eventCount.count||0)+'</b><span>usage events</span></div>';
-    byId('adminUsers').innerHTML=profiles.data.map(user=>'<div class="account-item"><div><b>'+escapeHtml(user.full_name||user.email)+'</b><small>'+escapeHtml(user.email)+(user.company?' · '+escapeHtml(user.company):'')+'</small></div><small>Joined '+new Date(user.created_at).toLocaleDateString()+'<br>Last active '+new Date(user.last_seen_at||user.created_at).toLocaleString()+'</small></div>').join('');
+    byId('adminUsers').innerHTML=profiles.data.map(user=>'<div class="account-item"><div><b>'+escapeHtml(user.full_name||user.email)+'</b><small>'+escapeHtml(user.email)+(user.company?' · '+escapeHtml(user.company):'')+' · '+escapeHtml(user.auth_provider||'email')+'</small></div><small>Joined '+new Date(user.created_at).toLocaleDateString()+'<br>Last active '+new Date(user.last_seen_at||user.created_at).toLocaleString()+'</small></div>').join('');
     const emailById=new Map(profiles.data.map(user=>[user.id,user.email]));
     byId('adminEvents').innerHTML=recentEvents.data.map(event=>'<div class="account-item"><div><b>'+escapeHtml(event.event_name.replace(/_/g,' '))+'</b><small>'+(event.user_id?'Account: '+escapeHtml(emailById.get(event.user_id)||event.user_id):'Anonymous: '+escapeHtml(String(event.visitor_id).slice(0,8)))+' · '+escapeHtml(event.device_type)+' · '+escapeHtml(event.browser)+' / '+escapeHtml(event.operating_system)+(event.referrer_host?' · from '+escapeHtml(event.referrer_host):'')+'</small></div><small>'+new Date(event.created_at).toLocaleString()+'<br>'+escapeHtml(event.timezone||'Unknown time zone')+'</small></div>').join('')||'<div class="account-status">No activity recorded yet.</div>';
   }
@@ -151,7 +159,7 @@
     byId('accountBtn').onclick=openModal;byId('accountClose').onclick=closeModal;
     byId('accountModal').addEventListener('click',event=>{if(event.target===byId('accountModal'))closeModal();});
     byId('authToggle').onclick=()=>{authMode=authMode==='signup'?'login':'signup';renderMode();};
-    byId('authSubmit').onclick=submitAuth;byId('authLogout').onclick=logout;
+    byId('authSubmit').onclick=submitAuth;byId('googleLogin').onclick=signInWithGoogle;byId('authLogout').onclick=logout;
     byId('syncNow').onclick=async()=>{await mergeCloudShortlist();productEvent('shortlist_sync');setStatus('memberStatus','Shortlist synchronized.');};
     byId('saveProject').onclick=saveProject;
     byId('authPassword').addEventListener('keydown',event=>{if(event.key==='Enter')submitAuth();});
@@ -162,6 +170,7 @@
     getAccessToken:()=>session&&session.access_token||'',
     getUser:()=>session&&session.user||null,
     syncShortlist,
+    requireAuth,
     openAccount:openModal
   };
 
