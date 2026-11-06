@@ -1,4 +1,4 @@
-# GitHub Scout account backend setup
+# HireCode account backend setup
 
 The account backend uses Supabase Authentication, Postgres and Row Level
 Security. It adds recruiter accounts, synced shortlists, hiring projects and an
@@ -26,7 +26,7 @@ recommended so the owner can know that registered email addresses are valid.
 
 ## 3. Deploy the website files
 
-Copy these files into the GitHub Scout repository and push them to `main`:
+Copy these files into the HireCode repository and push them to `main`:
 
 - `index.html`
 - `backend.js`
@@ -42,7 +42,7 @@ Vercel will deploy the update automatically.
 2. Select **Create account / Sign in**.
 3. Register with `shahzad.muzzamil@gmail.com`.
 4. Open the confirmation email from Supabase.
-5. Return to GitHub Scout and sign in.
+5. Return to HireCode and sign in.
 
 This email is the only account permitted to open the owner dashboard.
 

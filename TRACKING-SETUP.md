@@ -1,4 +1,4 @@
-# GitHub Scout visitor tracking setup
+# HireCode visitor tracking setup
 
 ## 1. Create the database table
 
@@ -17,7 +17,7 @@ will redeploy the site automatically when the repository is connected.
 
 ## 3. Verify tracking
 
-1. Open the deployed GitHub Scout website in a private browser window.
+1. Open the deployed HireCode website in a private browser window.
 2. Refresh the page once.
 3. In Supabase, open **Table Editor** and select `visitor_events`.
 4. A `page_view` row should appear.

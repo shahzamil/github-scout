@@ -3,7 +3,7 @@
   const URL='https://welgeoyeurirwujlowle.supabase.co';
   const KEY='sb_publishable_jU_058tObbl9KzXA0BXXqw_WogEzgUV';
   const ADMIN_EMAIL='shahzad.muzzamil@gmail.com';
-  if(!window.supabase||!window.supabase.createClient){console.warn('GitHub Scout account service could not load.');return;}
+  if(!window.supabase||!window.supabase.createClient){console.warn('HireCode account service could not load.');return;}
 
   const client=window.supabase.createClient(URL,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   let session=null;

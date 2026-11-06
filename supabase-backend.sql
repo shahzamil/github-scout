@@ -1,4 +1,4 @@
--- GitHub Scout accounts and recruiter workspace backend
+-- HireCode accounts and recruiter workspace backend
 -- Run this entire file once after supabase-tracker.sql.
 
 create or replace function public.is_scout_admin()
@@ -151,6 +151,6 @@ select id,email,coalesce(raw_user_meta_data ->> 'full_name',raw_user_meta_data -
 from auth.users
 on conflict (id) do nothing;
 
-comment on table public.profiles is 'Registered GitHub Scout accounts. Passwords remain inside Supabase Auth.';
+comment on table public.profiles is 'Registered HireCode accounts. Passwords remain inside Supabase Auth.';
 comment on table public.projects is 'Private hiring projects and job descriptions owned by each recruiter.';
 comment on table public.saved_candidates is 'Private saved candidate records owned by each recruiter.';

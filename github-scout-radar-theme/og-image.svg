@@ -3,8 +3,8 @@
   <rect width="1200" height="630" fill="url(#g)"/>
   <rect x="72" y="68" width="1056" height="494" rx="32" fill="#fff" stroke="#e0e2f5" stroke-width="3"/>
   <rect x="120" y="116" width="72" height="72" rx="18" fill="#4f46e5"/>
-  <path d="M140 138h33v9h-23v10h20v9h-20v14h-10v-42Z" fill="#fff"/>
-  <text x="216" y="167" font-family="Arial,Helvetica,sans-serif" font-size="40" font-weight="700" fill="#0f172a">GitHub <tspan fill="#4f46e5">Scout</tspan></text>
+  <text x="156" y="165" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="32" font-weight="700" letter-spacing="-1" fill="#fff">HC</text>
+  <text x="216" y="167" font-family="Arial,Helvetica,sans-serif" font-size="40" font-weight="700" fill="#0f172a">Hire<tspan fill="#4f46e5">Code</tspan></text>
   <text x="120" y="282" font-family="Arial,Helvetica,sans-serif" font-size="58" font-weight="700" fill="#0f172a">Find and evaluate</text>
   <text x="120" y="350" font-family="Arial,Helvetica,sans-serif" font-size="58" font-weight="700" fill="#0f172a">software engineers on GitHub</text>
   <text x="120" y="425" font-family="Arial,Helvetica,sans-serif" font-size="27" fill="#64748b">Candidate sourcing · public coding evidence · JD matching</text>

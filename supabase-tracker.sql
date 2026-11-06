@@ -1,4 +1,4 @@
--- GitHub Scout anonymous analytics setup
+-- HireCode anonymous analytics setup
 -- Run this entire file once in Supabase: SQL Editor -> New query -> Run.
 
 create table if not exists public.visitor_events (
@@ -100,4 +100,4 @@ revoke all on function public.get_public_visitor_count() from public;
 grant execute on function public.get_public_visitor_count() to anon, authenticated;
 
 comment on table public.visitor_events is
-  'Privacy-safe anonymous GitHub Scout usage events. Never stores tokens, usernames, searches, job descriptions, LinkedIn text, shortlist data, or candidate data.';
+  'Privacy-safe anonymous HireCode usage events. Never stores tokens, usernames, searches, job descriptions, LinkedIn text, shortlist data, or candidate data.';

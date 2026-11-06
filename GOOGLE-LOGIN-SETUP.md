@@ -1,10 +1,10 @@
-# GitHub Scout Google login setup
+# HireCode Google login setup
 
 ## Google Cloud configuration
 
 1. Open Google Cloud Console and create or select a project.
 2. Open **Google Auth Platform > Branding**.
-3. Use `GitHub Scout` as the application name and complete the required contact fields.
+3. Use `HireCode` as the application name and complete the required contact fields.
 4. Open **Audience** and select **External** so any Google account can sign in.
 5. Open **Data Access** and keep only the basic identity scopes: `openid`, email and profile.
 6. Open **Clients** and create an OAuth client.
