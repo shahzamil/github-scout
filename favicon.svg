@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#4f46e5"/>
-  <text x="32" y="43" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="30" font-weight="700" letter-spacing="-1" fill="#fff">HC</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="14" fill="#ffffff"/>
+  <g transform="translate(12 12) scale(0.3524)">
+    <path fill="#14112B" d="M0 0 L30.95 0 L30.95 113.5 L0 113.5 Z M82.54 0 L113.5 0 L113.5 113.5 L82.54 113.5 Z"/>
+    <path fill="#5B47FF" d="M30.95 52.23 L82.54 26.44 L82.54 61.26 L30.95 87.06 Z"/>
+  </g>
 </svg>
